@@ -13,7 +13,7 @@
     <nav class="main-nav" id="navbar">
         <div class="container nav-container">
             <div class="logo-container">
-                <h1 class="font-serif logo-text">AyurSutra</h1>
+                 <img src="pic1.png" alt="AyurSutra Logo" class="logo-image">
             </div>
             <div class="nav-right-group">
                 <nav class="nav-links">
@@ -56,7 +56,7 @@
                 </div>
                 <div class="fade-in floating">
                     <div class="hero-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                        <img src="https://mauryaayurveda.com/wp-content/uploads/2022/09/abhyanga-treatment.jpg" 
                              alt="Panchakarma Therapy" 
                              class="hero-image">
                         <div class="hero-image-overlay"></div>
@@ -280,7 +280,7 @@
                         </div>
                     </div>
                     <p class="font-text">
-                        "The personalized approach and attention to detail at AyurSutra exceeded my expectations. My arthritis pain has significantly reduced after the treatment."
+                        "The personalized approach and attention to detail at AyurSutra exceeded my expectations. My arthritis pain has significantly reduced after the treatment."  
                     </p>
                     <div class="rating-stars">
                         <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
@@ -320,8 +320,47 @@
         </div>
     </footer>
 
-    <script type="module" src="firebaseInit.js"></script>
-    <script type="module" src="uiIntegration.js"></script>
     <script src="index.js"></script>
+
+    <!-- Minimal: attach click handlers to testimonial/staff images and map to portals -->
+    <script>
+    (function(){
+      function attachStaffImageLinks(){
+        const staffImgs = Array.from(document.querySelectorAll('.testimonial-author img'));
+        if (!staffImgs.length) return;
+        staffImgs.forEach((img, idx) => {
+          img.style.cursor = 'pointer';
+          img.setAttribute('role','link');
+          img.addEventListener('click', () => {
+            try {
+              const role = (localStorage.getItem('last_role') || '').toLowerCase();
+              if (role === 'doctor') { window.location.href = 'doctor.html'; return; }
+              if (role === 'staff') { window.location.href = 'clinic.html'; return; }
+
+              // Fallback mapping by index: second -> doctor, third -> clinic
+              if (idx === 1) { window.location.href = 'doctor.html'; return; }
+              if (idx === 2) { window.location.href = 'clinic.html'; return; }
+
+              // Default: send to login with clinic preselected
+              window.location.href = 'loginup.html?role=clinic';
+            } catch (_) {
+              window.location.href = 'loginup.html?role=clinic';
+            }
+          }, { passive: true });
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          attachStaffImageLinks();
+          // try again after a short delay in case DOM is modified later
+          setTimeout(attachStaffImageLinks, 600);
+        });
+      } else {
+        attachStaffImageLinks();
+        setTimeout(attachStaffImageLinks, 600);
+      }
+    })();
+    </script>
 </body>
 </html>
