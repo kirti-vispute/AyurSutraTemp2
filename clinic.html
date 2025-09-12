@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -64,12 +64,12 @@
                         <svg class="h-12 w-12 text-sage-700 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         <span class="text-xl font-semibold text-sage-800 text-center">Appointments</span>
                     </button>
-                     <button data-page="patients" class="dashboard-card flex flex-col items-center justify-center p-6 bg-cream-50 rounded-2xl shadow-md border border-sage-100 hover:bg-white transition transform hover:-translate-y-1 hover:shadow-lg">
+                    <button data-page="patients" class="dashboard-card flex flex-col items-center justify-center p-6 bg-cream-50 rounded-2xl shadow-md border border-sage-100 hover:bg-white transition transform hover:-translate-y-1 hover:shadow-lg">
                         <svg class="h-12 w-12 text-sage-700 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                         <span class="text-xl font-semibold text-sage-800 text-center">Patients</span>
                     </button>
                     <button data-page="practitioners" class="dashboard-card flex flex-col items-center justify-center p-6 bg-cream-50 rounded-2xl shadow-md border border-sage-100 hover:bg-white transition transform hover:-translate-y-1 hover:shadow-lg">
-                         <svg class="h-12 w-12 text-sage-700 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 4h5m-5 4h5m-5-8h5" /></svg>
+                        <svg class="h-12 w-12 text-sage-700 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 4h5m-5 4h5m-5-8h5" /></svg>
                         <span class="text-xl font-semibold text-sage-800 text-center">Practitioners</span>
                     </button>
                     <button data-page="emergencies" class="dashboard-card flex flex-col items-center justify-center p-6 bg-cream-50 rounded-2xl shadow-md border border-sage-100 hover:bg-white transition transform hover:-translate-y-1 hover:shadow-lg relative">
@@ -101,8 +101,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, query, orderBy, addDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, query, addDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC6gvn7RRTxlFLN9kqMzrn3hS26b9vCMYM",
@@ -116,9 +116,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
-        const secondaryApp = initializeApp(firebaseConfig, "secondary");
-        const secondaryAuth = getAuth(secondaryApp);
 
         // --- GLOBAL STATE ---
         let allUsers = [], allAppointments = [], allPatients = {}, allPractitioners = [], allEmergencies = [], allFeedback = [];
@@ -127,32 +124,10 @@
         const pageTitle = document.getElementById('page-title');
         const pages = document.querySelectorAll('.page-content');
         const detailsModal = document.getElementById('details-modal');
-        // Add other modal elements here later
 
-        // --- AUTH & INIT (Authentication is currently DISABLED) ---
-        // For development, we load the dashboard directly.
-        // To re-enable security, comment out the line below and uncomment the onAuthStateChanged block.
+        // Init (auth disabled for dev)
         initDashboard(); 
-        
-        /*
-        // RE-ENABLE THIS BLOCK FOR PRODUCTION
-        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const docSnap = await getDoc(doc(db, "users", user.uid));
-                if (docSnap.exists() && docSnap.data().role === 'clinic') {
-                    initDashboard();
-                } else {
-                    alert("Access Denied. You do not have clinic privileges.");
-                    signOut(auth);
-                    window.location.href = 'loginup.html';
-                }
-            } else {
-                 window.location.href = 'loginup.html';
-            }
-        });
-        */
-        
+
         document.getElementById('logout-button').addEventListener('click', () => {
              alert("Logged out!"); // Replace with signOut(auth) when auth is enabled
         });
@@ -166,6 +141,13 @@
                     fetchData('emergencies'),
                     fetchData('feedback')
                 ]);
+
+                // ✅ Seed demo practitioners if none exist
+                if (!allPractitioners || allPractitioners.length === 0) {
+                    await seedDemoPractitioners();
+                    await fetchData('practitioners'); // refresh
+                }
+
                 renderDashboardPage();
             } catch (error) {
                 console.error("Init Error:", error);
@@ -188,6 +170,43 @@
                 case 'emergencies': allEmergencies = data; break;
                 case 'feedback': allFeedback = data; break;
             }
+        }
+
+        // --- DEMO PRACTITIONERS SEEDER (runs once if collection empty) ---
+        async function seedDemoPractitioners() {
+            const demos = [
+                {
+                    name: "Dr. Meera N.",
+                    speciality: "Panchakarma Specialist",
+                    experienceYears: 9,
+                    availableDays: ["Mon","Wed","Fri"],
+                    photoURL: "https://images.unsplash.com/photo-1550831107-1553da8c8464?w=256&q=80",
+                    rating: 4.8
+                },
+                {
+                    name: "Dr. Raghav S.",
+                    speciality: "Keraliya Ayurveda",
+                    experienceYears: 12,
+                    availableDays: ["Tue","Thu","Sat"],
+                    photoURL: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=256&q=80",
+                    rating: 4.6
+                },
+                {
+                    name: "Dr. Aditi P.",
+                    speciality: "Rasayana & Rejuvenation",
+                    experienceYears: 7,
+                    availableDays: ["Mon","Tue","Fri"],
+                    photoURL: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=256&q=80",
+                    rating: 4.7
+                }
+            ];
+            for (const p of demos) {
+                await addDoc(collection(db, "practitioners"), {
+                    ...p,
+                    createdAt: new Date().toISOString()
+                });
+            }
+            console.log("Demo practitioners seeded");
         }
         
         // --- PAGE NAVIGATION & RENDERING ---
@@ -227,7 +246,7 @@
         }
         
         function renderDashboardPage() {
-             const newEmergencies = allEmergencies.filter(e => e.status === 'New');
+            const newEmergencies = allEmergencies.filter(e => e.status === 'New');
             const badge = document.getElementById('emergency-badge');
             if (newEmergencies.length > 0) {
                 badge.textContent = newEmergencies.length;
@@ -253,8 +272,7 @@
                 ${createBackButton()}
             `;
             
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const today = new Date(); today.setHours(0, 0, 0, 0);
 
             let appointmentsToRender;
             if (activeFilter === 'upcoming') {
@@ -329,7 +347,6 @@
 
         // --- PATIENTS PAGE ---
         function renderPatientsPage() {
-            // This function is now complete as per the previous turn.
             const container = document.getElementById('patients-page');
             container.innerHTML = `
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-sage-100">
@@ -374,15 +391,11 @@
                 document.querySelectorAll('.patient-row').forEach(row => {
                     const name = row.dataset.name;
                     const email = row.dataset.email;
-                    if (name.includes(searchTerm) || email.includes(searchTerm)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
+                    row.style.display = (name.includes(searchTerm) || email.includes(searchTerm)) ? '' : 'none';
                 });
             });
         }
-        
+
         function viewPatientDetails(id) {
             const patient = allPatients[id];
             const patientAppointments = allAppointments.filter(appt => appt.userId === id).sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -423,8 +436,59 @@
             openModal(detailsModal);
         }
 
-        // --- Other render functions and modals ---
-        function renderPractitionersPage() { document.getElementById('practitioners-page').innerHTML = `<div>Practitioners Content</div>${createBackButton()}`; }
+        // --- PRACTITIONERS PAGE (now implemented) ---
+        function renderPractitionersPage() {
+            const container = document.getElementById('practitioners-page');
+            const items = allPractitioners || [];
+            container.innerHTML = `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-sage-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-serif font-bold text-sage-900">Practitioners</h3>
+                        <input type="search" id="practitioner-search" placeholder="Search by name or speciality..." class="px-4 py-2 w-72 border border-sage-200 rounded-full focus:ring-2 focus:ring-sage-300">
+                    </div>
+                    <div id="practitioners-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+                ${createBackButton()}
+            `;
+
+            const grid = document.getElementById('practitioners-grid');
+            const draw = (list) => {
+                if (!list.length) {
+                    grid.innerHTML = `<p class="text-sage-600 p-4 text-center col-span-full">No practitioners found.</p>`;
+                    return;
+                }
+                grid.innerHTML = list.map(p => `
+                    <div class="bg-cream-50 border border-sage-100 rounded-2xl p-5 shadow-sm hover:bg-white transition">
+                        <div class="flex items-center gap-4">
+                            <img src="${p.photoURL || 'https://via.placeholder.com/96x96?text=Dr'}" alt="${p.name || 'Practitioner'}" class="h-16 w-16 rounded-full object-cover border border-sage-200">
+                            <div>
+                                <p class="text-xl font-semibold text-sage-800">${p.name || 'Unnamed'}</p>
+                                <p class="text-sage-600">${p.speciality || '—'}</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-sage-700 text-base">
+                            <p><strong>Experience:</strong> ${p.experienceYears || 0} yrs</p>
+                            <p><strong>Available:</strong> ${(p.availableDays || []).join(', ') || '—'}</p>
+                            ${p.rating ? `<p><strong>Rating:</strong> ${p.rating.toFixed(1)} / 5</p>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            };
+
+            draw(items);
+
+            // simple search
+            document.getElementById('practitioner-search').addEventListener('keyup', (e) => {
+                const q = e.target.value.toLowerCase();
+                const filtered = items.filter(p => 
+                    (p.name || '').toLowerCase().includes(q) ||
+                    (p.speciality || '').toLowerCase().includes(q)
+                );
+                draw(filtered);
+            });
+        }
+
+        // --- Other placeholder pages (unchanged visuals) ---
         function renderUsersPage() { document.getElementById('users-page').innerHTML = `<div>Users Content</div>${createBackButton()}`; }
         function renderEmergenciesPage() { document.getElementById('emergencies-page').innerHTML = `<div>Emergencies Content</div>${createBackButton()}`; }
         function renderFeedbackPage() { document.getElementById('feedback-page').innerHTML = `<div>Feedback Content</div>${createBackButton()}`; }
@@ -447,7 +511,7 @@
         document.body.addEventListener('click', async e => {
             if (e.target.classList.contains('view-patient-btn')) viewPatientDetails(e.target.dataset.id);
             if (e.target.classList.contains('view-appt-btn')) viewAppointmentDetails(e.target.dataset.id);
-            if (e.target.classList.contains('close-modal-btn')) closeModal(e.target.closest('.modal'));
+            if (e.target.classList.contains('close-modal-btn')) closeModal(detailsModal);
             
             if (e.target.classList.contains('mark-complete-btn')) {
                 const docId = e.target.dataset.id;
@@ -457,7 +521,7 @@
                     if(index > -1) allAppointments[index].status = 'Completed';
                     renderAppointmentsPage();
                     closeModal(detailsModal);
-                } catch (error) { console.error("Error updating status:", error); alert("Could not update status.")}
+                } catch (error) { console.error("Error updating status:", error); alert("Could not update status.");}
             }
         });
     </script>
