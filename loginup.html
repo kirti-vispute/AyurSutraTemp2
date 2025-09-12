@@ -20,20 +20,23 @@
     }
   </script>
   <style>
-    .glow-card{box-shadow:0 8px 20px rgba(107,142,78,.15),0 2px 6px rgba(0,0,0,.05);transition:transform .3s ease,box-shadow .3s ease}
-    .glow-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(107,142,78,.25),0 4px 12px rgba(0,0,0,.08)}
+    .glow-card{box-shadow:0 8px 20px rgba(107,142,78,0.15),0 2px 6px rgba(0,0,0,0.05);transition:transform .3s ease,box-shadow .3s ease}
+    .glow-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(107,142,78,0.25),0 4px 12px rgba(0,0,0,0.08)}
     .form-container{display:none}
     .form-container.active{display:block}
-    .segmented-control{display:flex;border:1px solid #d1dac2;border-radius:.5rem;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.05)}
+    .segmented-control{display:flex;border:1px solid #d1dac2;border-radius:.5rem;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.05)}
     .segmented-control>label{flex:1;text-align:center;cursor:pointer;transition:background-color .2s,color .2s,transform .2s}
     .segmented-control .control-label:hover{background-color:#f6f7f0}
+    .small-muted{font-size:0.9rem;color:#6b8e4e}
+    .field-help{font-size:0.85rem;color:#8faa76;margin-top:0.25rem}
+    .hidden { display: none !important; }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-cream-50 via-sage-50 to-sage-100 font-body">
 
   <div class="md:flex bg-white rounded-2xl glow-card max-w-5xl w-full border border-sage-100 overflow-hidden">
     <div class="md:w-1/2 p-10 flex flex-col justify-center items-center text-center bg-sage-50">
-      <h1 class="text-6xl font-serif font-bold tracking-wide bg-gradient-to-r from-sage-700 to-sage-500 text-transparent bg-clip-text mb-6">AyurSutra</h1>
+      <img src="pic1.png" alt="AyurSutra Logo" class="logo-image">
       <h2 class="text-3xl font-serif font-semibold text-sage-900 mb-4">Your Journey to Holistic Healing</h2>
       <p class="font-text text-sage-700 text-lg max-w-md leading-relaxed">
         Experience authentic Panchakarma therapies that detoxify, rejuvenate, and restore balance. 
@@ -48,24 +51,31 @@
         <p id="message-text"></p>
       </div>
 
-      <!-- Sign In -->
       <div id="signin-form-container" class="form-container active">
         <form id="signin-form" class="space-y-6">
           <div>
             <label class="block text-sm font-medium text-sage-700 mb-2">Select your role...</label>
-            <div class="segmented-control border-sage-200">
-              <label class="relative block">
-                <input type="radio" name="signinUserType" value="patient" required class="sr-only peer">
-                <div class="w-full py-3 px-4 text-center text-sage-600 transition-all duration-200 control-label hover:bg-sage-50 peer-checked:bg-sage-100 peer-checked:text-sage-800">Patient</div>
-              </label>
-              <label class="relative block">
-                <input type="radio" name="signinUserType" value="staff" class="sr-only peer">
-                <div class="w-full py-3 px-4 text-center text-sage-600 transition-all duration-200 control-label hover:bg-sage-50 peer-checked:bg-sage-100 peer-checked:text-sage-800">Staff</div>
-              </label>
-              <label class="relative block">
-                <input type="radio" name="signinUserType" value="admin" class="sr-only peer">
-                <div class="w-full py-3 px-4 text-center text-sage-600 transition-all duration-200 control-label hover:bg-sage-50 peer-checked:bg-sage-100 peer-checked:text-sage-800">Admin</div>
-              </label>
+            <div id="main-role-view">
+              <div class="segmented-control border border-sage-200">
+                <label class="relative block">
+                  <input type="radio" name="signinUserType" value="patient" required class="sr-only peer" checked>
+                  <div class="w-full py-3 px-4 text-center text-sage-600 transition-all duration-200 control-label">Patient</div>
+                </label>
+                <div id="show-clinic-roles-btn" class="w-full py-3 px-4 text-center text-sage-600 transition-all duration-200 control-label cursor-pointer hover:bg-sage-50">Clinic</div>
+              </div>
+            </div>
+            <div id="clinic-role-view" class="hidden">
+              <div class="segmented-control border border-sage-200">
+                <label class="relative block">
+                  <input type="radio" name="signinUserType" value="staff" required class="sr-only peer">
+                  <div class="w-full py-3 px-4 text-center text-sage-600 transition-all duration-200 control-label">Staff</div>
+                </label>
+                <label class="relative block">
+                  <input type="radio" name="signinUserType" value="doctor" required class="sr-only peer">
+                  <div class="w-full py-3 px-4 text-center text-sage-600 transition-all duration-200 control-label">Doctor</div>
+                </label>
+              </div>
+              <button type="button" id="back-to-main-roles-btn" class="mt-2 text-sm text-sage-600 hover:underline">‹ Back to role selection</button>
             </div>
           </div>
           <div>
@@ -79,90 +89,106 @@
           <button type="submit" class="w-full bg-sage-600 text-white py-3 rounded-lg font-semibold hover:bg-sage-700 transition duration-300 shadow-md uppercase tracking-wider text-sm">Log In</button>
         </form>
         <p class="mt-4 text-center text-sm text-sage-600">
-          Don't have an account?
+          Don't have an account? 
           <a href="#" id="signup-link" class="font-medium text-sage-600 hover:text-sage-500">Create One</a>
         </p>
       </div>
 
-      <!-- Sign Up -->
       <div id="signup-form-container" class="form-container">
         <form id="signup-form" class="space-y-6">
           <div>
-            <label class="block text-sm font-medium text-sage-700 mb-2">Select your role.</label>
-            <div class="segmented-control border-sage-200">
+            <label class="block text-sm font-medium text-sage-700 mb-2">Select your role...</label>
+            <div class="segmented-control border border-sage-200">
               <label class="relative block">
-                <input type="radio" name="signupUserType" value="patient" required class="sr-only peer">
-                <div class="w-full py-3 px-4 text-center text-sage-600 transition-all duration-200 control-label hover:bg-sage-50 peer-checked:bg-sage-100 peer-checked:text-sage-800">Patient</div>
+                <input type="radio" name="signupUserType" value="patient" required class="sr-only peer" checked>
+                <div class="w-full py-3 px-4 text-center text-sage-600 transition-all duration-200 control-label">Patient</div>
               </label>
+
+              <label class="relative block">
+                <input type="radio" name="signupUserType" value="clinic" class="sr-only peer">
+                <div class="w-full py-3 px-4 text-center text-sage-600 transition-all duration-200 control-label">Clinic</div>
+              </label>
+
+              <!-- Added staff and doctor options for signup -->
               <label class="relative block">
                 <input type="radio" name="signupUserType" value="staff" class="sr-only peer">
-                <div class="w-full py-3 px-4 text-center text-sage-600 transition-all duration-200 control-label hover:bg-sage-50 peer-checked:bg-sage-100 peer-checked:text-sage-800">Staff</div>
+                <div class="w-full py-3 px-4 text-center text-sage-600 transition-all duration-200 control-label">Staff</div>
               </label>
               <label class="relative block">
-                <input type="radio" name="signupUserType" value="admin" class="sr-only peer">
-                <div class="w-full py-3 px-4 text-center text-sage-600 transition-all duration-200 control-label hover:bg-sage-50 peer-checked:bg-sage-100 peer-checked:text-sage-800">Admin</div>
+                <input type="radio" name="signupUserType" value="doctor" class="sr-only peer">
+                <div class="w-full py-3 px-4 text-center text-sage-600 transition-all duration-200 control-label">Doctor</div>
               </label>
             </div>
           </div>
+
           <div>
             <label for="signup-email" class="block text-sm font-medium text-sage-700 mb-1">Email address</label>
             <input type="email" id="signup-email" name="email" required class="w-full px-4 py-2 rounded-lg border border-sage-200 focus:ring-sage-500 focus:border-sage-500 transition duration-200">
           </div>
           <div>
             <label for="signup-password" class="block text-sm font-medium text-sage-700 mb-1">Password</label>
-            <input type="password" id="signup-password" name="password" required class="w-full px-4 py-2 rounded-lg border border-sage-200 focus:ring-sage-500 focus:border-sage-500 transition duration-200">
+            <input type="password" id="signup-password" name="password" required class="w-full px-4 py-2 rounded-lg border border-sage-200 focus:ring-sage-500 focus:border-sage-500 transition duration-200" minlength="6">
           </div>
+
+          <!-- Extra fields when signing up as staff/doctor -->
+          <div id="clinic-link-fields" class="hidden">
+            <label class="block text-sm font-medium text-sage-700 mb-1">Clinic Email (required for Staff/Doctor)</label>
+            <input type="email" id="clinic-email" name="clinicEmail" placeholder="clinic@example.com" class="w-full px-4 py-2 rounded-lg border border-sage-200">
+            <p class="field-help">Enter the clinic admin's email to link this staff/doctor account to that clinic (if it exists).</p>
+          </div>
+
+          <div>
+            <label for="display-name" class="block text-sm font-medium text-sage-700 mb-1">Full name</label>
+            <input type="text" id="display-name" name="displayName" required class="w-full px-4 py-2 rounded-lg border border-sage-200">
+          </div>
+
           <button type="submit" class="w-full bg-sage-600 text-white py-3 rounded-lg font-semibold hover:bg-sage-700 transition duration-300 shadow-md uppercase tracking-wider text-sm">Create Account</button>
         </form>
         <p class="mt-4 text-center text-sm text-sage-600">
-          Already have an account?
+          Already have an account? 
           <a href="#" id="signin-link" class="font-medium text-sage-600 hover:text-sage-500">Log In</a>
         </p>
       </div>
+
+      <!-- Staff details modal (kept if you have other flows that use it) -->
+      <div id="staff-details-overlay" class="hidden fixed inset-0 items-center justify-center bg-black bg-opacity-50">
+        <form id="staff-details-form" class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+          <h3 class="text-lg font-semibold mb-4">Enter Staff Details</h3>
+          <div class="mb-3">
+            <label class="block text-sm mb-1">Full name</label>
+            <input id="staff-fullname" type="text" class="w-full px-3 py-2 border rounded" />
+            <p id="err-fullname" class="text-red-500 text-sm hidden">Full name required</p>
+          </div>
+          <div class="mb-3">
+            <label class="block text-sm mb-1">Birthdate</label>
+            <input id="staff-birthdate" type="date" class="w-full px-3 py-2 border rounded" />
+            <p id="err-birthdate" class="text-red-500 text-sm hidden">Valid birthdate required</p>
+          </div>
+          <div class="mb-3">
+            <label class="block text-sm mb-1">Phone</label>
+            <input id="staff-phone" type="tel" class="w-full px-3 py-2 border rounded" />
+            <p id="err-phone" class="text-red-500 text-sm hidden">Valid phone required</p>
+          </div>
+          <div class="flex justify-end gap-2">
+            <button type="button" id="staff-cancel" class="px-4 py-2 bg-gray-200 rounded">Cancel</button>
+            <button type="submit" id="staff-submit" class="px-4 py-2 bg-sage-600 text-white rounded">Save</button>
+          </div>
+        </form>
+      </div>
+
     </div>
   </div>
 
-  <!-- Staff Details Modal (added, uses existing utility classes) -->
-  <div id="staff-details-overlay" class="fixed inset-0 bg-black bg-opacity-30 hidden items-center justify-center p-4" aria-hidden="true">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 border border-sage-100 shadow-xl">
-      <h3 class="text-xl font-serif font-semibold text-sage-900 mb-4">Complete Staff Details</h3>
-      <p class="text-sm text-sage-700 mb-4">Please provide details to finish setting up your staff profile.</p>
-      <form id="staff-details-form" class="space-y-4" novalidate>
-        <div>
-          <label for="staff-fullname" class="block text-sm font-medium text-sage-700 mb-1">Full name</label>
-          <input id="staff-fullname" name="fullname" type="text" required class="w-full px-4 py-2 rounded-lg border border-sage-200 focus:ring-sage-500 focus:border-sage-500 transition duration-200">
-          <p id="err-fullname" class="mt-1 text-sm text-red-600 hidden">Please enter your full name.</p>
-        </div>
-        <div>
-          <label for="staff-birthdate" class="block text-sm font-medium text-sage-700 mb-1">Birthdate</label>
-          <input id="staff-birthdate" name="birthdate" type="date" required class="w-full px-4 py-2 rounded-lg border border-sage-200 focus:ring-sage-500 focus:border-sage-500 transition duration-200">
-          <p id="err-birthdate" class="mt-1 text-sm text-red-600 hidden">Please enter a valid date (YYYY-MM-DD).</p>
-        </div>
-        <div>
-          <label for="staff-phone" class="block text-sm font-medium text-sage-700 mb-1">Phone number</label>
-          <input id="staff-phone" name="phone" type="tel" inputmode="tel" required placeholder="e.g., +919876543210" class="w-full px-4 py-2 rounded-lg border border-sage-200 focus:ring-sage-500 focus:border-sage-500 transition duration-200">
-          <p id="err-phone" class="mt-1 text-sm text-red-600 hidden">Enter 7–15 digits (numbers, optional leading +).</p>
-        </div>
-        <div class="flex justify-end gap-3 pt-2">
-          <button type="button" id="staff-cancel" class="px-4 py-2 bg-white border border-sage-200 rounded-lg">Cancel</button>
-          <button type="submit" class="px-5 py-2 bg-sage-600 text-white rounded-lg font-semibold hover:bg-sage-700 transition">Save Details</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Firebase + Routing -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
-
-    // Firebase config (kept the same as yours)
+    import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+    
     const firebaseConfig = {
       apiKey: "AIzaSyC6gvn7RRTxlFLN9kqMzrn3hS26b9vCMYM",
       authDomain: "ayursutra-f90d2.firebaseapp.com",
       projectId: "ayursutra-f90d2",
-      storageBucket: "ayursutra-f90d2.firebasestorage.app",
+      storageBucket: "ayursutra-f90d2.appspot.com",
       messagingSenderId: "1014791978312",
       appId: "1:1014791978312:web:938b6861c94f0a3a81477d",
       measurementId: "G-Y0CDSS5NWD"
@@ -178,29 +204,40 @@
     const messageBox = document.getElementById('message-box');
     const messageText = document.getElementById('message-text');
 
-    // toggle links
-    document.querySelectorAll('#signin-link').forEach(link => {
-      link.addEventListener('click', e => { e.preventDefault(); toggleForm('signin'); });
+    // Role switcher elements for sign-in form
+    const mainRoleView = document.getElementById('main-role-view');
+    const clinicRoleView = document.getElementById('clinic-role-view');
+    const showClinicRolesBtn = document.getElementById('show-clinic-roles-btn');
+    const backToMainRolesBtn = document.getElementById('back-to-main-roles-btn');
+
+    // Signup extras
+    const signupRadios = Array.from(document.querySelectorAll('input[name="signupUserType"]'));
+    const clinicLinkFields = document.getElementById('clinic-link-fields');
+
+    document.querySelectorAll('#signup-link, #signin-link').forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            toggleForm(link.id.includes('signup') ? 'signup' : 'signin');
+        });
     });
-    const signupLink = document.getElementById('signup-link');
-    if (signupLink) {
-      signupLink.addEventListener('click', e => { e.preventDefault(); toggleForm('signup'); });
-    }
 
-    function showMessage(message, type='success') {
+    function showMessage(message, type = 'error') {
       messageText.textContent = message;
-      messageBox.className = 'text-sm px-4 py-3 rounded-lg mb-4 border';
+      messageBox.className = 'text-sm px-4 py-3 rounded-lg mb-4 border block'; 
       if (type === 'success') {
-        messageBox.classList.add('bg-sage-50','border-sage-300','text-sage-800');
+        messageBox.classList.add('bg-green-50', 'border-green-300', 'text-green-800');
       } else {
-        messageBox.classList.add('bg-red-50','border-red-300','text-red-800');
+        messageBox.classList.add('bg-red-50', 'border-red-300', 'text-red-800');
       }
-      messageBox.classList.remove('hidden');
     }
 
-    function toggleForm(which) {
-      messageBox.classList.add('hidden');
-      if (which === 'signup') {
+    function hideMessage() {
+        messageBox.classList.add('hidden');
+    }
+
+    function toggleForm(formToShow) {
+      hideMessage();
+      if (formToShow === 'signup') {
         signinFormContainer.classList.remove('active');
         signupFormContainer.classList.add('active');
         formTitle.textContent = 'Create Your Account';
@@ -211,158 +248,243 @@
       }
     }
 
-    // --- SIGN UP: save role then (optionally) route ---
-    document.getElementById('signup-form').addEventListener('submit', async e => {
+    // --- Role Switcher Logic (Sign-in) ---
+    showClinicRolesBtn.addEventListener('click', () => {
+        mainRoleView.classList.add('hidden');
+        clinicRoleView.classList.remove('hidden');
+        const pat = document.querySelector('input[name="signinUserType"][value="patient"]');
+        if (pat) pat.checked = false;
+    });
+
+    backToMainRolesBtn.addEventListener('click', () => {
+        clinicRoleView.classList.add('hidden');
+        mainRoleView.classList.remove('hidden');
+        const clinicRoles = document.querySelectorAll('input[name="signinUserType"][value="staff"], input[name="signinUserType"][value="doctor"]');
+        clinicRoles.forEach(input => input.checked = false);
+        const pat = document.querySelector('input[name="signinUserType"][value="patient"]');
+        if (pat) pat.checked = true;
+    });
+
+    // Show/hide extra signup fields when user selects staff/doctor
+    signupRadios.forEach(r => r.addEventListener('change', () => {
+      const val = document.querySelector('input[name="signupUserType"]:checked').value;
+      if (val === 'staff' || val === 'doctor') {
+        clinicLinkFields.classList.remove('hidden');
+      } else {
+        clinicLinkFields.classList.add('hidden');
+      }
+    }));
+
+    // --- Signup handler (supports patient, clinic, staff, doctor) ---
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
       e.preventDefault();
+      hideMessage();
+
       const email = document.getElementById('signup-email').value.trim();
       const password = document.getElementById('signup-password').value;
-      const roleInput = document.querySelector('input[name="signupUserType"]:checked');
-      if (!roleInput) { showMessage('Please select a user type.', 'error'); return; }
-      const role = roleInput.value;
+      const displayName = document.getElementById('display-name').value.trim();
+      const userType = (document.querySelector('input[name="signupUserType"]:checked') || {}).value;
 
+      if (!userType) {
+        showMessage('Please select a user type.', 'error');
+        return;
+      }
+      if (!email || !password || !displayName) {
+        showMessage('Please fill all required fields.', 'error');
+        return;
+      }
+
+      // For staff/doctor we require a clinic email input to link
+      let clinicEmail = null;
+      let linkedClinicId = null;
+      if (userType === 'staff' || userType === 'doctor') {
+        clinicEmail = (document.getElementById('clinic-email').value || '').trim();
+        if (!clinicEmail) {
+          showMessage('Please provide the clinic admin email to link this staff/doctor account.', 'error');
+          return;
+        }
+
+        // try to resolve clinicId by email
+        try {
+          const q = query(collection(db, 'users'), where('email', '==', clinicEmail), where('role', '==', 'clinic'));
+          const snaps = await getDocs(q);
+          if (snaps && snaps.docs && snaps.docs.length > 0) {
+            linkedClinicId = snaps.docs[0].id;
+          } else {
+            linkedClinicId = null; // clinic not found — still allow creation but mark clinicEmail
+          }
+        } catch (err) {
+          // continue — do not block user creation due to query failure, but inform
+          console.error('clinic lookup failed', err);
+        }
+      }
+
+      // create auth user + profile doc
       try {
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
-        await setDoc(doc(db, "users", cred.user.uid), { email, role });
-        // Keep your current UX: ask them to log in after sign up
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Determine stored role and subrole:
+        // - For clinic owner: role = 'clinic'
+        // - For staff/doctor: role = 'clinic' (so signin checks pass), subrole indicates staff/doctor
+        // - For patient: role = 'patient'
+        let storedRole = 'patient';
+        let subrole = '';
+        if (userType === 'clinic') {
+          storedRole = 'clinic';
+        } else if (userType === 'staff' || userType === 'doctor') {
+          storedRole = 'clinic';
+          subrole = userType;
+        }
+
+        const userDocRef = doc(db, 'users', user.uid);
+        const payload = {
+          email,
+          displayName,
+          role: storedRole,
+          createdAt: new Date(),
+          profileCompleted: storedRole === 'clinic' ? true : false
+        };
+        if (subrole) payload.subrole = subrole;
+        if (clinicEmail) payload.clinicEmail = clinicEmail;
+        if (linkedClinicId) payload.clinicId = linkedClinicId;
+
+        await setDoc(userDocRef, payload);
+
         showMessage('Account created successfully! Please log in.', 'success');
         toggleForm('signin');
         document.getElementById('signin-email').value = email;
-        // If staff, open details modal immediately after account creation
-        if (role === 'staff') {
-          try { localStorage.setItem('doc_login_email', email); } catch(_){}
-          openStaffDetailsModal(email);
-        }
-      } catch (err) {
-        showMessage(`Error: ${err.message}`, 'error');
-      }
-    });
 
-    // --- SIGN IN: verify role, then route (Staff → doctor.html) ---
-    document.getElementById('signin-form').addEventListener('submit', async e => {
-      e.preventDefault();
-      const email = document.getElementById('signin-email').value.trim();
-      const password = document.getElementById('signin-password').value;
-      const roleInput = document.querySelector('input[name="signinUserType"]:checked');
-      if (!roleInput) { showMessage('Please select a user type.', 'error'); return; }
-      const selectedRole = roleInput.value;
-
-      try {
-        const { user } = await signInWithEmailAndPassword(auth, email, password);
-        const snap = await getDoc(doc(db, "users", user.uid));
-        if (!snap.exists()) {
-          showMessage('User profile not found. Please contact support.', 'error');
-          await signOut(auth);
-          return;
-        }
-        const storedRole = (snap.data().role || '').toLowerCase();
-        if (storedRole !== selectedRole) {
-          showMessage('Role selection does not match your account.', 'error');
-          await signOut(auth);
-          return;
-        }
-
-        // ✅ FINAL ROUTING
-        try { localStorage.setItem('last_role', storedRole); } catch(_){ }
-        if (storedRole === 'staff') {
-          // Persist email in localStorage so doctor portal can prefill
-          try { localStorage.setItem('doc_login_email', email); } catch(_){ }
-          window.location.href = 'doctor.html';   // changed from staff.html → doctor.html
-        } else if (storedRole === 'patient') {
-          window.location.href = 'patient.html';
-        } else if (storedRole === 'admin') {
-          window.location.href = 'admin.html';
-        } else {
-          // Fallback: send to home if role unknown
-          window.location.href = 'index.html';
-        }
-      } catch (err) {
-        let msg = "Invalid email or password. Please try again.";
-        if (['auth/wrong-password','auth/user-not-found','auth/invalid-credential'].includes(err.code)) {
-          msg = "Invalid email or password. Please try again.";
-        }
+      } catch (error) {
+        console.error('signup error', error);
+        let msg = "An error occurred. Please try again.";
+        if (error.code === 'auth/weak-password') msg = 'Password should be at least 6 characters.';
+        else if (error.code === 'auth/email-already-in-use') msg = 'This email address is already in use.';
         showMessage(msg, 'error');
       }
     });
 
-    // ---- Staff details modal logic ----
-    const overlay = document.getElementById('staff-details-overlay');
-    const form = document.getElementById('staff-details-form');
-    const cancelBtn = document.getElementById('staff-cancel');
-    const fullnameEl = document.getElementById('staff-fullname');
-    const birthdateEl = document.getElementById('staff-birthdate');
-    const phoneEl = document.getElementById('staff-phone');
-
-    function openStaffDetailsModal(email) {
-      // prefill from existing profile if available
-      try {
-        const existing = JSON.parse(localStorage.getItem('doc_profile_v1') || '{}') || {};
-        if (existing.fullname) fullnameEl.value = existing.fullname;
-        if (existing.birthdate) birthdateEl.value = existing.birthdate;
-        if (existing.phone) phoneEl.value = existing.phone;
-      } catch(_){}
-      overlay.classList.remove('hidden');
-      overlay.classList.add('flex');
-      setTimeout(()=> { (fullnameEl.value ? (birthdateEl.value ? phoneEl : birthdateEl) : fullnameEl).focus(); }, 0);
-      overlay.dataset.email = email || '';
-    }
-
-    function closeStaffDetailsModal() {
-      overlay.classList.add('hidden');
-      overlay.classList.remove('flex');
-      delete overlay.dataset.email;
-    }
-
-    if (cancelBtn) cancelBtn.addEventListener('click', () => closeStaffDetailsModal());
-
-    function showInlineError(id, show) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      if (show) el.classList.remove('hidden'); else el.classList.add('hidden');
-    }
-
-    function validateStaffFields() {
-      let firstInvalid = null;
-      const fullname = (fullnameEl.value || '').trim();
-      const birthdate = (birthdateEl.value || '').trim();
-      const phone = (phoneEl.value || '').trim();
-      const phoneOk = /^\+?\d{7,15}$/.test(phone);
-      let dateOk = false;
-      if (/^\d{4}-\d{2}-\d{2}$/.test(birthdate)) {
-        const d = new Date(birthdate + 'T00:00:00');
-        dateOk = !isNaN(d.getTime());
-      }
-      showInlineError('err-fullname', !fullname);
-      showInlineError('err-birthdate', !dateOk);
-      showInlineError('err-phone', !phoneOk);
-      if (!fullname) firstInvalid = fullnameEl;
-      else if (!dateOk) firstInvalid = birthdateEl;
-      else if (!phoneOk) firstInvalid = phoneEl;
-      return { ok: !!(!firstInvalid && fullname && dateOk && phoneOk), firstInvalid, values: { fullname, birthdate, phone } };
-    }
-
-    if (form) form.addEventListener('submit', e => {
+    // --- Signin handler (validates subrole for staff/doctor) ---
+    document.getElementById('signin-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const { ok, firstInvalid, values } = validateStaffFields();
-      if (!ok) { if (firstInvalid && firstInvalid.focus) firstInvalid.focus(); return; }
-      const email = overlay.dataset.email || '';
-      let existing = {};
-      try { existing = JSON.parse(localStorage.getItem('doc_profile_v1') || '{}') || {}; } catch(_){ existing = {}; }
-      const merged = {
-        ...existing,
-        role: 'staff',
-        email: email || existing.email || '',
-        fullname: values.fullname,
-        name: values.fullname,
-        birthdate: values.birthdate,
-        phone: values.phone
-      };
-      try { localStorage.setItem('doc_profile_v1', JSON.stringify(merged)); } catch(_){ }
-      closeStaffDetailsModal();
-      // Optional navigation (kept disabled to preserve existing flow):
-      // window.location.href = 'doctor.html';
+      hideMessage();
+
+      const email = document.getElementById('signin-email').value.trim();
+      const password = document.getElementById('signin-password').value;
+      const selectedRoleInput = document.querySelector('input[name="signinUserType"]:checked');
+
+      if (!selectedRoleInput) {
+        showMessage('Please select your role.', 'error'); return;
+      }
+      const selectedValue = selectedRoleInput.value;
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (!userDocSnap.exists()) {
+          await signOut(auth);
+          showMessage('User profile not found. Please contact support.', 'error');
+          return;
+        }
+
+        const storedRole = userDocSnap.data().role;
+        const storedSubrole = userDocSnap.data().subrole || '';
+
+        if (selectedValue === 'patient') {
+          if (storedRole === 'patient') {
+            localStorage.setItem('last_role', 'patient');
+            window.location.href = "patient.html";
+            return;
+          } else {
+            await signOut(auth);
+            showMessage('Role selection does not match your account.', 'error');
+            return;
+          }
+        }
+
+        if (selectedValue === 'staff' || selectedValue === 'doctor') {
+          // staff/doctor accounts are stored with role = 'clinic' and subrole param
+          if (storedRole === 'clinic' && storedSubrole === selectedValue) {
+            // success -> route accordingly
+            localStorage.setItem('last_role', selectedValue === 'staff' ? 'staff' : 'doctor');
+            if (selectedValue === 'staff') window.location.href = "clinic.html";
+            else window.location.href = "doctor.html";
+            return;
+          } else {
+            await signOut(auth);
+            // helpful error messages
+            if (storedRole !== 'clinic') {
+              showMessage('This account does not have clinic privileges.', 'error');
+            } else {
+              showMessage('Role selection does not match your clinic account subrole.', 'error');
+            }
+            return;
+          }
+        }
+
+        // fallback: unexpected role value
+        await signOut(auth);
+        showMessage('Invalid login role selected.', 'error');
+
+      } catch (err) {
+        console.error('signin error', err);
+        showMessage("Invalid email or password. Please try again.", 'error');
+      }
     });
+
   </script>
-  <script type="module" src="firebaseInit.js"></script>
-  <script type="module" src="uiIntegration.js"></script>
+
+  <!-- NEW: Preselect helper — same as previous (keeps non-destructive preselect) -->
+  <script>
+    (function(){
+      function tryOpenClinicViewAndSelect(sub) {
+        const showBtn = document.getElementById('show-clinic-roles-btn');
+        const clinicView = document.getElementById('clinic-role-view');
+        const mainView = document.getElementById('main-role-view');
+
+        if (showBtn) {
+          showBtn.click();
+        } else if (clinicView && mainView) {
+          mainView.classList.add('hidden');
+          clinicView.classList.remove('hidden');
+        }
+
+        setTimeout(() => {
+          if (!sub) return;
+          const input = document.querySelector(`input[name="signinUserType"][value="${sub}"]`);
+          if (input) {
+            input.checked = true;
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        }, 150);
+      }
+
+      function applyFromQuery() {
+        const params = new URLSearchParams(window.location.search);
+        const role = params.get('role');
+        const sub = params.get('sub'); // 'doctor' or 'staff' expected
+        if (!role && !sub) return;
+        if (role === 'clinic') {
+          tryOpenClinicViewAndSelect(sub);
+        } else if (sub) {
+          tryOpenClinicViewAndSelect(sub);
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          applyFromQuery();
+          setTimeout(applyFromQuery, 400);
+        });
+      } else {
+        applyFromQuery();
+        setTimeout(applyFromQuery, 200);
+      }
+    })();
+  </script>
+
 </body>
 </html>
