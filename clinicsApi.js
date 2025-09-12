@@ -26,5 +26,3 @@ export function listenStaffByClinic(clinicId, cb){
   const qRef = query(collection(db,'staff'), where('clinicId','==', clinicId));
   return onSnapshot(qRef, (snap)=> cb(snap.docs.map(d=> ({ id:d.id, ...d.data()}))));
 }
-
-
