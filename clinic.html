@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AyurSutra - Clinic Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: { 50: '#fefdf8' },
+                        sage: {
+                            50: '#f6f7f0', 100: '#e8ede0', 200: '#d1dac2',
+                            300: '#b3c49c', 400: '#8faa76', 500: '#6b8e4e',
+                            600: '#567a3e', 700: '#456334', 800: '#39502c', 900: '#2d4024',
+                        }
+                    },
+                    fontFamily: {
+                        'serif': ['Playfair Display', 'serif'],
+                        'body': ['Inter', 'sans-serif'],
+                        'text': ['Crimson Text', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .page-content { opacity: 0; transition: opacity 0.4s ease-in-out; display: none; }
+        .page-content.active { opacity: 1; display: block; }
+        .modal { transition: opacity 0.3s ease; }
+        .appt-filter-btn {
+            padding: 0.75rem 1.5rem;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        .appt-filter-btn.active {
+            border-color: #567a3e;
+            color: #2d4024;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-cream-50 via-sage-50 to-sage-100 font-body text-lg text-sage-900">
+    <div id="app-wrapper">
+        <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg shadow-sm border-b border-sage-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-3">
+                    <h1 class="text-3xl font-serif font-bold tracking-wide bg-gradient-to-r from-sage-700 to-sage-500 text-transparent bg-clip-text">AyurSutra</h1>
+                    <button id="logout-button" class="px-5 py-2 bg-sage-600 text-white text-sm rounded-full font-medium hover:bg-sage-700 transition">Log Out</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 p-6 md:p-12">
+            <h2 class="text-4xl font-semibold text-sage-900 mb-8 font-serif text-center" id="page-title">Clinic Dashboard</h2>
+
+            <!-- Dashboard Page -->
+            <section id="dashboard-page" class="page-content active">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-6 lg:gap-8 max-w-4xl mx-auto">
+                    <button data-page="appointments" class="dashboard-card flex flex-col items-center justify-center p-6 bg-cream-50 rounded-2xl shadow-md border border-sage-100 hover:bg-white transition transform hover:-translate-y-1 hover:shadow-lg">
+                        <svg class="h-12 w-12 text-sage-700 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span class="text-xl font-semibold text-sage-800 text-center">Appointments</span>
+                    </button>
+                     <button data-page="patients" class="dashboard-card flex flex-col items-center justify-center p-6 bg-cream-50 rounded-2xl shadow-md border border-sage-100 hover:bg-white transition transform hover:-translate-y-1 hover:shadow-lg">
+                        <svg class="h-12 w-12 text-sage-700 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        <span class="text-xl font-semibold text-sage-800 text-center">Patients</span>
+                    </button>
+                    <button data-page="practitioners" class="dashboard-card flex flex-col items-center justify-center p-6 bg-cream-50 rounded-2xl shadow-md border border-sage-100 hover:bg-white transition transform hover:-translate-y-1 hover:shadow-lg">
+                         <svg class="h-12 w-12 text-sage-700 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 4h5m-5 4h5m-5-8h5" /></svg>
+                        <span class="text-xl font-semibold text-sage-800 text-center">Practitioners</span>
+                    </button>
+                    <button data-page="emergencies" class="dashboard-card flex flex-col items-center justify-center p-6 bg-cream-50 rounded-2xl shadow-md border border-sage-100 hover:bg-white transition transform hover:-translate-y-1 hover:shadow-lg relative">
+                        <svg class="h-12 w-12 text-sage-700 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <span class="text-xl font-semibold text-sage-800 text-center">Emergencies</span>
+                        <span id="emergency-badge" class="absolute top-4 right-4 hidden h-6 w-6 rounded-full bg-red-500 text-white text-sm flex items-center justify-center"></span>
+                    </button>
+                    <button data-page="feedback" class="dashboard-card flex flex-col items-center justify-center p-6 bg-cream-50 rounded-2xl shadow-md border border-sage-100 hover:bg-white transition transform hover:-translate-y-1 hover:shadow-lg">
+                        <svg class="h-12 w-12 text-sage-700 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                        <span class="text-xl font-semibold text-sage-800 text-center">Feedback</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Other Pages will be rendered here -->
+            <section id="appointments-page" class="page-content"></section>
+            <section id="patients-page" class="page-content"></section>
+            <section id="practitioners-page" class="page-content"></section>
+            <section id="users-page" class="page-content"></section>
+            <section id="emergencies-page" class="page-content"></section>
+            <section id="feedback-page" class="page-content"></section>
+        </main>
+    </div>
+    
+    <!-- Modals -->
+    <div id="details-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center opacity-0 modal"></div>
+    <div id="practitioner-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center opacity-0 modal"></div>
+    <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center opacity-0 modal"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, query, orderBy, addDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC6gvn7RRTxlFLN9kqMzrn3hS26b9vCMYM",
+            authDomain: "ayursutra-f90d2.firebaseapp.com",
+            projectId: "ayursutra-f90d2",
+            storageBucket: "ayursutra-f90d2.appspot.com",
+            messagingSenderId: "1014791978312",
+            appId: "1:1014791978312:web:938b6861c94f0a3a81477d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        const secondaryApp = initializeApp(firebaseConfig, "secondary");
+        const secondaryAuth = getAuth(secondaryApp);
+
+        // --- GLOBAL STATE ---
+        let allUsers = [], allAppointments = [], allPatients = {}, allPractitioners = [], allEmergencies = [], allFeedback = [];
+
+        // --- UI ELEMENTS ---
+        const pageTitle = document.getElementById('page-title');
+        const pages = document.querySelectorAll('.page-content');
+        const detailsModal = document.getElementById('details-modal');
+        // Add other modal elements here later
+
+        // --- AUTH & INIT (Authentication is currently DISABLED) ---
+        // For development, we load the dashboard directly.
+        // To re-enable security, comment out the line below and uncomment the onAuthStateChanged block.
+        initDashboard(); 
+        
+        /*
+        // RE-ENABLE THIS BLOCK FOR PRODUCTION
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const docSnap = await getDoc(doc(db, "users", user.uid));
+                if (docSnap.exists() && docSnap.data().role === 'clinic') {
+                    initDashboard();
+                } else {
+                    alert("Access Denied. You do not have clinic privileges.");
+                    signOut(auth);
+                    window.location.href = 'loginup.html';
+                }
+            } else {
+                 window.location.href = 'loginup.html';
+            }
+        });
+        */
+        
+        document.getElementById('logout-button').addEventListener('click', () => {
+             alert("Logged out!"); // Replace with signOut(auth) when auth is enabled
+        });
+
+        async function initDashboard() {
+            try {
+                await Promise.all([
+                    fetchData('users'),
+                    fetchData('appointments'),
+                    fetchData('practitioners'),
+                    fetchData('emergencies'),
+                    fetchData('feedback')
+                ]);
+                renderDashboardPage();
+            } catch (error) {
+                console.error("Init Error:", error);
+                alert("Failed to load clinic data.");
+            }
+        }
+        
+        // --- DATA FETCHING ---
+        async function fetchData(collectionName) {
+            const querySnapshot = await getDocs(query(collection(db, collectionName)));
+            const data = querySnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            switch(collectionName) {
+                case 'users':
+                    allUsers = data;
+                    allPatients = {};
+                    data.forEach(user => { if (user.role === 'patient' && user.profileCompleted) allPatients[user.id] = user; });
+                    break;
+                case 'appointments': allAppointments = data; break;
+                case 'practitioners': allPractitioners = data; break;
+                case 'emergencies': allEmergencies = data; break;
+                case 'feedback': allFeedback = data; break;
+            }
+        }
+        
+        // --- PAGE NAVIGATION & RENDERING ---
+        function showPage(pageName) {
+            pages.forEach(p => p.classList.remove('active'));
+            const newPage = document.getElementById(`${pageName}-page`);
+            if (newPage) newPage.classList.add('active');
+            pageTitle.textContent = pageName === 'dashboard' ? 'Clinic Dashboard' : pageName.charAt(0).toUpperCase() + pageName.slice(1);
+        }
+
+        document.querySelectorAll('.dashboard-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const pageName = card.dataset.page;
+                switch(pageName) {
+                    case 'appointments': renderAppointmentsPage(); break;
+                    case 'patients': renderPatientsPage(); break;
+                    case 'practitioners': renderPractitionersPage(); break;
+                    case 'users': renderUsersPage(); break;
+                    case 'emergencies': renderEmergenciesPage(); break;
+                    case 'feedback': renderFeedbackPage(); break;
+                }
+                showPage(pageName);
+            });
+        });
+        
+        document.body.addEventListener('click', e => {
+            if (e.target.classList.contains('back-to-dashboard-btn')) showPage('dashboard');
+            if (e.target.classList.contains('appt-filter-btn')) {
+                document.querySelectorAll('.appt-filter-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                renderAppointmentsPage();
+            }
+        });
+
+        function createBackButton() {
+            return `<div class="mt-8 text-center"><button class="back-to-dashboard-btn px-6 py-2 bg-sage-600 text-white rounded-full font-medium hover:bg-sage-700 transition">‹ Back to Dashboard</button></div>`;
+        }
+        
+        function renderDashboardPage() {
+             const newEmergencies = allEmergencies.filter(e => e.status === 'New');
+            const badge = document.getElementById('emergency-badge');
+            if (newEmergencies.length > 0) {
+                badge.textContent = newEmergencies.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+        
+        // --- APPOINTMENTS PAGE ---
+        function renderAppointmentsPage() {
+            const container = document.getElementById('appointments-page');
+            const activeFilter = document.querySelector('.appt-filter-btn.active')?.dataset.filter || 'upcoming';
+
+            container.innerHTML = `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-sage-100">
+                    <div class="flex border-b border-sage-200 mb-4">
+                        <button data-filter="upcoming" class="appt-filter-btn ${activeFilter === 'upcoming' ? 'active' : ''}">Upcoming</button>
+                        <button data-filter="past" class="appt-filter-btn ${activeFilter === 'past' ? 'active' : ''}">Past & Completed</button>
+                    </div>
+                    <div id="appointments-list-container" class="space-y-4"></div>
+                </div>
+                ${createBackButton()}
+            `;
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            let appointmentsToRender;
+            if (activeFilter === 'upcoming') {
+                appointmentsToRender = allAppointments
+                    .filter(a => new Date(a.date) >= today && a.status === 'Confirmed')
+                    .sort((a,b) => new Date(a.date) - new Date(b.date) || a.time.localeCompare(b.time));
+            } else {
+                appointmentsToRender = allAppointments
+                    .filter(a => new Date(a.date) < today || a.status !== 'Confirmed')
+                    .sort((a,b) => new Date(b.date) - new Date(a.date) || b.time.localeCompare(a.time));
+            }
+            renderAppointmentList(appointmentsToRender, 'appointments-list-container');
+        }
+
+        function renderAppointmentList(appointments, elementId) {
+            const listEl = document.getElementById(elementId);
+            listEl.innerHTML = '';
+            if (appointments.length === 0) {
+                listEl.innerHTML = `<p class="text-sage-600 p-4 text-center">No appointments in this category.</p>`;
+                return;
+            }
+            appointments.forEach(appt => {
+                const patientName = allPatients[appt.userId]?.name || 'Unknown Patient';
+                let statusClass = { 'Confirmed': 'bg-blue-100 text-blue-800', 'Completed': 'bg-green-100 text-green-800', 'Cancelled': 'bg-red-100 text-red-800'}[appt.status] || 'bg-gray-100 text-gray-800';
+                
+                const card = document.createElement('div');
+                card.className = 'p-4 rounded-lg border border-sage-200 bg-white grid grid-cols-1 md:grid-cols-5 gap-4 items-center';
+                card.innerHTML = `
+                    <div class="md:col-span-2">
+                        <p class="font-bold text-lg">${patientName}</p>
+                        <p class="text-sage-600">${new Date(appt.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} at ${appt.time}</p>
+                    </div>
+                    <div><span class="px-3 py-1 text-sm font-medium rounded-full ${statusClass}">${appt.status}</span></div>
+                    <div class="text-lg font-semibold text-right md:text-left">₹${(appt.totalPrice || 0).toLocaleString('en-IN')}</div>
+                    <div class="text-right">
+                        <button data-id="${appt.id}" class="view-appt-btn px-4 py-2 bg-sage-600 text-white text-sm rounded-full font-medium hover:bg-sage-700 transition">View</button>
+                    </div>
+                `;
+                listEl.appendChild(card);
+            });
+        }
+        
+        function viewAppointmentDetails(id) {
+            const appt = allAppointments.find(a => a.id === id);
+            const patient = allPatients[appt.userId];
+            detailsModal.innerHTML = `
+                <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl transform transition-transform duration-300">
+                    <div class="p-6 border-b border-sage-100 flex justify-between items-center">
+                        <h3 class="text-2xl font-serif font-bold text-sage-900">Appointment for ${patient?.name || 'Unknown'}</h3>
+                        <button class="close-modal-btn text-sage-500 hover:text-sage-800 text-3xl">&times;</button>
+                    </div>
+                    <div class="p-6 max-h-[70vh] overflow-y-auto">
+                        <div class="grid grid-cols-2 gap-4 text-lg">
+                            <p><strong>Date:</strong> ${new Date(appt.date).toLocaleDateString('en-GB')}</p>
+                            <p><strong>Time:</strong> ${appt.time}</p>
+                            <p><strong>Practitioner:</strong> ${appt.practitioner}</p>
+                            <p><strong>Status:</strong> ${appt.status}</p>
+                            <p><strong>Total Price:</strong> ₹${(appt.totalPrice || 0).toLocaleString('en-IN')}</p>
+                        </div>
+                        <div class="mt-4 border-t pt-4">
+                            <h4 class="font-bold text-lg mb-2">Treatments:</h4>
+                            <ul class="list-disc list-inside">${(appt.treatments || []).map(t => `<li>${t.name}</li>`).join('')}</ul>
+                        </div>
+                        ${appt.status === 'Confirmed' ? `
+                        <div class="mt-6 text-right">
+                            <button data-id="${appt.id}" class="mark-complete-btn px-6 py-2 bg-green-600 text-white rounded-full font-semibold hover:bg-green-700 transition">Mark as Completed</button>
+                        </div>` : ''}
+                    </div>
+                </div>`;
+            openModal(detailsModal);
+        }
+
+        // --- PATIENTS PAGE ---
+        function renderPatientsPage() {
+            // This function is now complete as per the previous turn.
+            const container = document.getElementById('patients-page');
+            container.innerHTML = `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-sage-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-2xl font-serif font-bold text-sage-900">Patient Directory</h3>
+                        <input type="search" id="patient-search" placeholder="Search by name or email..." class="px-4 py-2 w-72 border border-sage-200 rounded-full focus:ring-2 focus:ring-sage-300">
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="border-b-2 border-sage-200">
+                                <tr>
+                                    <th class="p-3 text-lg font-semibold">Name</th>
+                                    <th class="p-3 text-lg font-semibold">Email</th>
+                                    <th class="p-3 text-lg font-semibold">Dosha</th>
+                                    <th class="p-3 text-lg font-semibold">DOB</th>
+                                    <th class="p-3 text-lg font-semibold">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patients-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                ${createBackButton()}
+            `;
+            
+            const tbody = document.getElementById('patients-table-body');
+            const patientsArray = Object.values(allPatients).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            tbody.innerHTML = patientsArray.map(patient => `
+                <tr class="border-b border-sage-100 hover:bg-sage-50 patient-row" data-name="${(patient.name || '').toLowerCase()}" data-email="${(patient.email || '').toLowerCase()}">
+                    <td class="p-3 font-bold">${patient.name || 'N/A'}</td>
+                    <td class="p-3">${patient.email}</td>
+                    <td class="p-3">${patient.dosha || 'N/A'}</td>
+                    <td class="p-3">${patient.dob || 'N/A'}</td>
+                    <td class="p-3">
+                        <button data-id="${patient.id}" class="view-patient-btn px-4 py-2 bg-sage-600 text-white text-sm rounded-full font-medium hover:bg-sage-700 transition">View</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            document.getElementById('patient-search').addEventListener('keyup', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                document.querySelectorAll('.patient-row').forEach(row => {
+                    const name = row.dataset.name;
+                    const email = row.dataset.email;
+                    if (name.includes(searchTerm) || email.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        function viewPatientDetails(id) {
+            const patient = allPatients[id];
+            const patientAppointments = allAppointments.filter(appt => appt.userId === id).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            detailsModal.innerHTML = `
+                <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl transform transition-transform duration-300">
+                    <div class="p-6 border-b border-sage-100 flex justify-between items-center">
+                        <h3 class="text-2xl font-serif font-bold text-sage-900">Patient Details: ${patient.name}</h3>
+                        <button class="close-modal-btn text-sage-500 hover:text-sage-800 text-3xl">&times;</button>
+                    </div>
+                    <div class="p-6 max-h-[70vh] overflow-y-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-1">
+                            <h4 class="text-xl font-serif text-sage-800 mb-4 border-b pb-2">Profile</h4>
+                            <div class="space-y-3">
+                                <p><strong>Email:</strong> ${patient.email}</p>
+                                <p><strong>DOB:</strong> ${patient.dob}</p>
+                                <p><strong>Dosha:</strong> ${patient.dosha}</p>
+                                <p><strong>Allergies:</strong> ${patient.allergy || 'None'}</p>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <h4 class="text-xl font-serif text-sage-800 mb-4 border-b pb-2">Appointment History</h4>
+                            <div class="space-y-3">${patientAppointments.length ? patientAppointments.map(appt => {
+                                let statusClass = { 'Confirmed': 'bg-blue-100 text-blue-800', 'Completed': 'bg-green-100 text-green-800', 'Cancelled': 'bg-red-100 text-red-800'}[appt.status] || 'bg-gray-100 text-gray-800';
+                                return `
+                                <div class="p-3 rounded-lg border border-sage-100 bg-sage-50">
+                                    <div class="flex justify-between items-center">
+                                        <p class="font-bold">${new Date(appt.date).toLocaleDateString('en-GB')}</p>
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${statusClass}">${appt.status}</span>
+                                    </div>
+                                    <p class="text-sm text-sage-600">${(appt.treatments || []).length} treatment(s) - ₹${(appt.totalPrice || 0).toLocaleString('en-IN')}</p>
+                                </div>`
+                            }).join('') : '<p class="text-sage-600">No appointments found.</p>'}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            openModal(detailsModal);
+        }
+
+        // --- Other render functions and modals ---
+        function renderPractitionersPage() { document.getElementById('practitioners-page').innerHTML = `<div>Practitioners Content</div>${createBackButton()}`; }
+        function renderUsersPage() { document.getElementById('users-page').innerHTML = `<div>Users Content</div>${createBackButton()}`; }
+        function renderEmergenciesPage() { document.getElementById('emergencies-page').innerHTML = `<div>Emergencies Content</div>${createBackButton()}`; }
+        function renderFeedbackPage() { document.getElementById('feedback-page').innerHTML = `<div>Feedback Content</div>${createBackButton()}`; }
+
+        // --- MODALS & FORMS ---
+        function openModal(modalEl) {
+             modalEl.classList.remove('hidden');
+             setTimeout(() => {
+                modalEl.classList.remove('opacity-0');
+                if (modalEl.querySelector('.transform')) modalEl.querySelector('.transform').classList.remove('scale-95');
+            }, 10);
+        }
+        function closeModal(modalEl) {
+            modalEl.classList.add('opacity-0');
+            if (modalEl.querySelector('.transform')) modalEl.querySelector('.transform').classList.add('scale-95');
+            setTimeout(() => modalEl.classList.add('hidden'), 300);
+        }
+        
+        // --- EVENT DELEGATION ---
+        document.body.addEventListener('click', async e => {
+            if (e.target.classList.contains('view-patient-btn')) viewPatientDetails(e.target.dataset.id);
+            if (e.target.classList.contains('view-appt-btn')) viewAppointmentDetails(e.target.dataset.id);
+            if (e.target.classList.contains('close-modal-btn')) closeModal(e.target.closest('.modal'));
+            
+            if (e.target.classList.contains('mark-complete-btn')) {
+                const docId = e.target.dataset.id;
+                try {
+                    await updateDoc(doc(db, "appointments", docId), { status: 'Completed' });
+                    const index = allAppointments.findIndex(a => a.id === docId);
+                    if(index > -1) allAppointments[index].status = 'Completed';
+                    renderAppointmentsPage();
+                    closeModal(detailsModal);
+                } catch (error) { console.error("Error updating status:", error); alert("Could not update status.")}
+            }
+        });
+    </script>
+</body>
+</html>
