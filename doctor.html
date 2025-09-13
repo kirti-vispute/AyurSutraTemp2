@@ -14,6 +14,18 @@
 
   <!-- Local stylesheet -->
   <link rel="stylesheet" href="doctor.css">
+  <style>
+    .logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-image {
+    height: 60px;   /* adjust until it looks right */
+    width: auto;
+    object-fit: contain;
+}
+  </style>
 </head>
 <body class="gradient-bg min-h-screen text-sage-900">
 
@@ -21,7 +33,9 @@
   <header class="sticky top-0 z-50 bg-transparent backdrop-blur-sm py-4">
     <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <h1 class="font-serif text-3xl tracking-wide select-none">AyurSutra</h1>
+         <button id="logo-link" class="logo-container">
+                    <img src="pic1.png" alt="AyurSutra Logo" class="logo-image">    
+         </button>
       </div>
       <div class="flex items-center gap-3">
         <button id="btn-open-profile-mini" title="Open profile quick" class="bg-white px-3 py-1 rounded-full border">Profile</button>
