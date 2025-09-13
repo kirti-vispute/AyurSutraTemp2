@@ -41,6 +41,16 @@
             color: #2d4024;
             font-weight: 600;
         }
+         .logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-image {
+    height: 60px;   /* adjust until it looks right */
+    width: auto;
+    object-fit: contain;
+}
     </style>
 </head>
 <body class="bg-gradient-to-br from-cream-50 via-sage-50 to-sage-100 font-body text-lg text-sage-900">
@@ -48,7 +58,9 @@
         <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg shadow-sm border-b border-sage-100">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-3">
-                    <h1 class="text-3xl font-serif font-bold tracking-wide bg-gradient-to-r from-sage-700 to-sage-500 text-transparent bg-clip-text">AyurSutra</h1>
+                     <button id="logo-link" class="logo-container">
+                    <img src="pic1.png" alt="AyurSutra Logo" class="logo-image">    
+                </button>
                     <button id="logout-button" class="px-5 py-2 bg-sage-600 text-white text-sm rounded-full font-medium hover:bg-sage-700 transition">Log Out</button>
                 </div>
             </div>
@@ -527,3 +539,4 @@
     </script>
 </body>
 </html>
+
