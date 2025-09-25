@@ -1,6 +1,6 @@
-/* doctor.js — ensure at least 3 demo appointments exist and keep app features working
+/* doctor.js – clean version without demo data
    - Defensive: avoids errors if optional elements are missing
-   - Preserves existing stored appointments; only adds demo ones if there are fewer than 3
+   - No demo data seeding - starts with empty data structures
 */
 
 const STORAGE = {
@@ -35,133 +35,33 @@ const toast = (msg, type = "success", ms = 2500) => {
   setTimeout(()=> el.remove(), ms);
 };
 
-// Doctor display name helper — ensures "Dr." prefix appears once
+// Doctor display name helper – ensures "Dr." prefix appears once
 function getDoctorDisplayName() {
   const profile = load(STORAGE.PROFILE) || {};
   const raw = (profile.name || "Doctor").trim();
   return /^dr\.?\s/i.test(raw) ? raw.replace(/^dr\.?\s*/i, 'Dr. ') : `Dr. ${raw}`;
 }
 
-/* ---------- Seed/demo data (robust) ----------
-   Guarantees:
-     - Patients/treatments/profile/cases exist for demo
-     - Appointments: if there are fewer than 3 stored, create demo appointments to reach 3
-*/
-function seedDemoData() {
-  // profile
+/* ---------- Initialize empty data structures ---------- */
+function initializeEmptyData() {
+  // Initialize empty data structures only if they don't exist
   if (!load(STORAGE.PROFILE)) {
-    save(STORAGE.PROFILE, {
-      name: "Dr. Anjali Verma",
-      email: "anjali@example.com",
-      phone: "+91-9876543210",
-      specialization: "Ayurveda Physician",
-      hours: "10:00–18:00",
-      bio: "Experienced practitioner in Panchakarma",
-      photo: ""
-    });
+    save(STORAGE.PROFILE, {});
   }
-
-  // treatments
   if (!load(STORAGE.TREATMENTS)) {
-    save(STORAGE.TREATMENTS, [
-      { id: 1, name: "Abhyanga", duration_min: 60, price: 1200, description: "Full-body oil massage", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", category: "panchakarma" },
-      { id: 2, name: "Shirodhara", duration_min: 45, price: 2500, description: "Oil poured on forehead", image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", category: "panchakarma" }
-    ]);
+    save(STORAGE.TREATMENTS, []);
   }
-
-  // patients
   if (!load(STORAGE.PATIENTS)) {
-    save(STORAGE.PATIENTS, [
-      { email: "patient1@example.com", name: "Ramesh Kumar", phone: "+91-9000000001", allergies: ["Penicillin"], notes: "Knee pain", dob: "1980-01-01", history: ["Hypertension"] },
-      { email: "patient2@example.com", name: "Priya Sharma", phone: "+91-9000000002", allergies: [], notes: "", dob: "1990-05-10", history: ["Insomnia"] }
-    ]);
+    save(STORAGE.PATIENTS, []);
   }
-
-  // cases (if none)
   if (!load(STORAGE.CASES)) {
-    save(STORAGE.CASES, [
-      {
-        id: genId(),
-        patientEmail: "patient1@example.com",
-        createdAt: new Date().toISOString(),
-        subjective: "Patient complains of knee pain when climbing stairs.",
-        objective: "Mild swelling and tenderness at medial joint line.",
-        assessment: "Early degenerative changes likely; suspect patellofemoral involvement.",
-        plan: "Trial Abhyanga + strengthen quadriceps; physio referral; follow-up in 2 weeks.",
-        attachments: []
-      }
-    ]);
+    save(STORAGE.CASES, []);
   }
-
-  // progress: generate simple weekly series for each patient (Pain/Sleep/Stress)
+  if (!load(STORAGE.APPTS)) {
+    save(STORAGE.APPTS, []);
+  }
   if (!load(STORAGE.PROGRESS)) {
-    const patients = load(STORAGE.PATIENTS, []);
-    const progressStore = {};
-    const weeks = 10;
-    const now = Date.now();
-    patients.forEach((p, idx) => {
-      const labels = Array.from({length: weeks}, (_, i) => {
-        const d = new Date(now - (weeks-1-i)*7*24*3600*1000);
-        return `${d.getMonth()+1}/${d.getDate()}`;
-      });
-      const pain   = Array.from({length: weeks}, (_, i) => Math.max(0, Math.round((6 + (Math.sin(i/2 + idx) * 1.4) - i*0.25) * 10)/10));
-      const sleep  = Array.from({length: weeks}, (_, i) => Math.max(3, Math.round((6 + (Math.cos(i/3 + idx) * 1.1) + i*0.12) * 10)/10));
-      const stress = Array.from({length: weeks}, (_, i) => Math.max(1, Math.round((5 + (Math.sin(i/1.6 + idx) * 1.0) - i*0.18) * 10)/10));
-      progressStore[p.email] = { labels, pain, sleep, stress };
-    });
-    save(STORAGE.PROGRESS, progressStore);
-  }
-
-  // appointments: if key missing or length < 8, add demo appointments without deleting existing ones
-  let appts = load(STORAGE.APPTS, []);
-  if (!Array.isArray(appts)) appts = [];
-
-  if (appts.length < 8) {
-    // We'll create demo appts and append them (keep existing)
-    const now = new Date();
-
-    // Helper to create a date with specific hour:minute (local time)
-    function makeLocalDate(base, offsetDays, hour, minute) {
-      const d = new Date(base);
-      d.setDate(d.getDate() + (offsetDays || 0));
-      d.setHours(hour, minute || 0, 0, 0);
-      return d;
-    }
-
-    // Candidate demo appointments (times chosen to be reasonable)
-    const candidates = [
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 0, 9,  0).toISOString(),  duration:60, patientEmail:"patient1@example.com", patientName:"Ramesh Kumar",  notes:"Initial consult — knee pain",   status:"confirmed" },
-      { treatments:["Shirodhara"],start: makeLocalDate(now, 0, 11, 30).toISOString(), duration:45, patientEmail:"patient2@example.com", patientName:"Priya Sharma",  notes:"Sleep therapy follow-up",       status:"confirmed" },
-      { treatments:["Nasya"],     start: makeLocalDate(now, 0, 14, 0).toISOString(),  duration:30, patientEmail:"patient3@example.com", patientName:"Asha Patel",    notes:"Back pain consult",            status:"confirmed" },
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 0, 16, 0).toISOString(),  duration:60, patientEmail:"patient4@example.com", patientName:"Vikram Singh",  notes:"Digestive care",               status:"confirmed" },
-      { treatments:["Shirodhara"],start: makeLocalDate(now, 1, 9, 30).toISOString(),  duration:45, patientEmail:"patient2@example.com", patientName:"Priya Sharma",  notes:"Second session",               status:"confirmed" },
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 1, 11, 0).toISOString(),  duration:60, patientEmail:"patient1@example.com", patientName:"Ramesh Kumar",  notes:"Therapy session — package",    status:"confirmed" },
-      { treatments:["Nasya"],     start: makeLocalDate(now, 1, 14, 30).toISOString(), duration:30, patientEmail:"patient3@example.com", patientName:"Asha Patel",    notes:"Follow-up treatment",           status:"confirmed" },
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 1, 16, 30).toISOString(), duration:60, patientEmail:"patient4@example.com", patientName:"Vikram Singh",  notes:"Digestive therapy",            status:"confirmed" },
-      { treatments:["Shirodhara"],start: makeLocalDate(now, 2, 10, 0).toISOString(),  duration:45, patientEmail:"patient2@example.com", patientName:"Priya Sharma",  notes:"Third session",                status:"confirmed" },
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 2, 12, 0).toISOString(),  duration:60, patientEmail:"patient1@example.com", patientName:"Ramesh Kumar",  notes:"Progress check",               status:"confirmed" }
-    ];
-
-    // Add only as many as needed to reach 8 appointments
-    let needed = 8 - appts.length;
-    for (let i = 0; i < candidates.length && needed > 0; i++) {
-      // avoid duplicating an appointment with same start & patientName
-      const exists = appts.some(a => a.start === candidates[i].start && a.patientName === candidates[i].patientName);
-      if (!exists) {
-        appts.push({ id: genId(), ...candidates[i] });
-        needed--;
-      }
-    }
-    // If still need, shift times by +2 days to avoid duplicates
-    let idx = 0;
-    while (appts.length < 8 && idx < candidates.length) {
-      const c = candidates[idx];
-      const shifted = { ...c, start: new Date(new Date(c.start).getTime() + 2*24*3600*1000).toISOString() };
-      appts.push({ id: genId(), ...shifted });
-      idx++;
-    }
-
-    save(STORAGE.APPTS, appts);
+    save(STORAGE.PROGRESS, {});
   }
 }
 
@@ -202,7 +102,7 @@ function showPage(id, title = "") {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* ---------- Profile rendering (unchanged) ---------- */
+/* ---------- Profile rendering ---------- */
 function loadProfileToForm(){
   const p = load(STORAGE.PROFILE) || {};
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ""; };
@@ -249,7 +149,7 @@ function renderTreatments(filter="all", search=""){
       e.stopPropagation();
       const id = button.dataset.id;
       const treatment = (load(STORAGE.TREATMENTS)||[]).find(x => String(x.id) === String(id));
-      toast(`${treatment ? treatment.name : "Treatment"} selected — use booking flow to confirm.`);
+      toast(`${treatment ? treatment.name : "Treatment"} selected – use booking flow to confirm.`);
     });
   });
 
@@ -277,7 +177,7 @@ function renderTreatmentDetail(t){
   if (detailClose) detailClose.addEventListener('click', ()=> showPage('treatments-section','Treatments'));
 }
 
-/* ---------- Appointments (renders appointments-list) ---------- */
+/* ---------- Appointments ---------- */
 function renderAppointments(filterDate=null){
   const container = document.getElementById('appointments-list');
   if (!container) return;
@@ -344,7 +244,7 @@ function renderAppointments(filterDate=null){
   }));
 }
 
-/* ---------- Patients list & detail (simplified) ---------- */
+/* ---------- Patients list & detail ---------- */
 function renderPatients(search = "") {
   const listEl = document.getElementById('patients-list');
   if (!listEl) return;
@@ -417,12 +317,12 @@ function renderCasePatientFilter() {
   const selDetail = document.getElementById('case-patient');
   const patients = load(STORAGE.PATIENTS) || [];
   if (sel) {
-    sel.innerHTML = `<option value="">— All patients —</option>`;
-    patients.forEach(p => { const opt = document.createElement('option'); opt.value = p.email; opt.textContent = `${p.name} — ${p.email}`; sel.appendChild(opt); });
+    sel.innerHTML = `<option value="">– All patients –</option>`;
+    patients.forEach(p => { const opt = document.createElement('option'); opt.value = p.email; opt.textContent = `${p.name} – ${p.email}`; sel.appendChild(opt); });
   }
   if (selDetail) {
-    selDetail.innerHTML = `<option value="">— Select patient —</option>`;
-    patients.forEach(p => { const opt = document.createElement('option'); opt.value = p.email; opt.textContent = `${p.name} — ${p.email}`; selDetail.appendChild(opt); });
+    selDetail.innerHTML = `<option value="">– Select patient –</option>`;
+    patients.forEach(p => { const opt = document.createElement('option'); opt.value = p.email; opt.textContent = `${p.name} – ${p.email}`; selDetail.appendChild(opt); });
   }
 }
 
@@ -444,27 +344,26 @@ function renderCasesList(filterPatient = "") {
   });
 }
 
-/* ----- small case helpers (only minimal features used in UI) ----- */
+/* ----- small case helpers ---------- */
 function openCaseDetail(caseId) {
   const cases = getAllCases();
   const c = cases.find(x => x.id === caseId);
   if (!c) return;
   document.getElementById('case-empty') && (document.getElementById('case-empty').style.display = 'none');
   document.getElementById('case-detail') && (document.getElementById('case-detail').style.display = 'block');
-  document.getElementById('case-title') && (document.getElementById('case-title').textContent = `Case — ${ (load(STORAGE.PATIENTS)||[]).find(p=>p.email===c.patientEmail)?.name || c.patientEmail }`);
+  document.getElementById('case-title') && (document.getElementById('case-title').textContent = `Case – ${ (load(STORAGE.PATIENTS)||[]).find(p=>p.email===c.patientEmail)?.name || c.patientEmail }`);
   document.getElementById('case-meta') && (document.getElementById('case-meta').textContent = `Created: ${ new Date(c.createdAt).toLocaleString() }`);
   if (document.getElementById('case-patient')) document.getElementById('case-patient').value = c.patientEmail || "";
   if (document.getElementById('case-subjective')) document.getElementById('case-subjective').value = c.subjective || "";
   if (document.getElementById('case-objective')) document.getElementById('case-objective').value = c.objective || "";
   if (document.getElementById('case-assessment')) document.getElementById('case-assessment').value = c.assessment || "";
   if (document.getElementById('case-plan')) document.getElementById('case-plan').value = c.plan || "";
-  // attachments list - keep simple (download/remove not required for demo)
 }
 
 /* ---------- Init wiring (DOMContentLoaded) ---------- */
 document.addEventListener('DOMContentLoaded', () => {
-  // seed demo data (ensures appointments exist)
-  seedDemoData();
+  // Initialize empty data structures
+  initializeEmptyData();
 
   // If coming from login, inject the email into profile (without overwriting name if set)
   try {
@@ -485,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
     else if (target === "treatments-section") { renderTreatments(); showPage(target, "Treatments"); }
     else if (target === "booking-section") { renderPatients(); showPage(target, "My Patients"); }
     else if (target === "appointments-section") { renderAppointments(); showPage(target, "My Appointments"); }
-    else if (target === "plans-section") { renderCasePatientFilter(); renderCasesList(); showPage(target, "Case Study — SOAP Notes"); }
+    else if (target === "plans-section") { renderCasePatientFilter(); renderCasesList(); showPage(target, "Case Study – SOAP Notes"); }
     else if (target === "charts-section") { renderCharts(); showPage(target, "Progress Charts"); }
     else if (target === "feedback-section") { showPage(target, "Feedback"); }
     else { showPage(target); }
@@ -636,9 +535,9 @@ function renderCharts() {
   const pdata = first ? series[first.email] : null;
 
   const labels = pdata?.labels || ["-3w","-2w","-1w","This"];
-  const pain   = pdata?.pain   || [6,5,4,3];
-  const sleep  = pdata?.sleep  || [6,6.2,6.5,7];
-  const stress = pdata?.stress || [5,4.4,3.8,3];
+  const pain   = pdata?.pain   || [0,0,0,0];
+  const sleep  = pdata?.sleep  || [0,0,0,0];
+  const stress = pdata?.stress || [0,0,0,0];
 
   // If Chart.js available
   if (typeof Chart !== 'undefined' && patientCanvas.getContext) {
@@ -663,7 +562,7 @@ function renderCharts() {
         }
       });
 
-      // Therapy effectiveness bar chart (static comparison)
+      // Therapy effectiveness bar chart (empty data initially)
       if (therapyCanvas && therapyCanvas.getContext) {
         new Chart(therapyCanvas, {
           type: 'bar',
@@ -671,7 +570,7 @@ function renderCharts() {
             labels: ['Abhyanga','Shirodhara','Nasya','Combined'],
             datasets: [{
               label: 'Effectiveness (1-10)',
-              data: [8.2, 7.7, 6.5, 9.0],
+              data: [0, 0, 0, 0],
               backgroundColor: [
                 'rgba(86,122,62,0.8)',
                 'rgba(43,107,90,0.8)',
