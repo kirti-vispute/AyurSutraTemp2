@@ -48,53 +48,42 @@ function getDoctorDisplayName() {
      - Appointments: if there are fewer than 3 stored, create demo appointments to reach 3
 */
 function seedDemoData() {
-  // profile
+  // profile: Set to empty object for no demo data
   if (!load(STORAGE.PROFILE)) {
-    save(STORAGE.PROFILE, {
-      name: "Dr. Anjali Verma",
-      email: "anjali@example.com",
-      phone: "+91-9876543210",
-      specialization: "Ayurveda Physician",
-      hours: "10:00–18:00",
-      bio: "Experienced practitioner in Panchakarma",
-      photo: ""
-    });
+    save(STORAGE.PROFILE, {});
   }
 
-  // treatments
-  if (!load(STORAGE.TREATMENTS)) {
+  // treatments: REMOVING ALL PRE-EXISTING DEMO TREATMENTS
+  if (!load(STORAGE.TREATMENTS) || load(STORAGE.TREATMENTS).length === 0) {
     save(STORAGE.TREATMENTS, [
       { id: 1, name: "Abhyanga", duration_min: 60, price: 1200, description: "Full-body oil massage", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", category: "panchakarma" },
       { id: 2, name: "Shirodhara", duration_min: 45, price: 2500, description: "Oil poured on forehead", image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", category: "panchakarma" }
     ]);
+  } else {
+     // If the key exists, we only save the two essential demo treatments, removing others
+     const existing = load(STORAGE.TREATMENTS).filter(t => t.id === 1 || t.id === 2);
+     if (existing.length < 2) {
+        save(STORAGE.TREATMENTS, [
+            { id: 1, name: "Abhyanga", duration_min: 60, price: 1200, description: "Full-body oil massage", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", category: "panchakarma" },
+            { id: 2, name: "Shirodhara", duration_min: 45, price: 2500, description: "Oil poured on forehead", image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", category: "panchakarma" }
+        ]);
+     }
   }
 
-  // patients
-  if (!load(STORAGE.PATIENTS)) {
-    save(STORAGE.PATIENTS, [
-      { email: "patient1@example.com", name: "Ramesh Kumar", phone: "+91-9000000001", allergies: ["Penicillin"], notes: "Knee pain", dob: "1980-01-01", history: ["Hypertension"] },
-      { email: "patient2@example.com", name: "Priya Sharma", phone: "+91-9000000002", allergies: [], notes: "", dob: "1990-05-10", history: ["Insomnia"] }
-    ]);
+
+  // patients: Set to empty array for no demo data
+  if (!load(STORAGE.PATIENTS) || load(STORAGE.PATIENTS).length > 0) {
+    save(STORAGE.PATIENTS, []);
   }
 
-  // cases (if none)
-  if (!load(STORAGE.CASES)) {
-    save(STORAGE.CASES, [
-      {
-        id: genId(),
-        patientEmail: "patient1@example.com",
-        createdAt: new Date().toISOString(),
-        subjective: "Patient complains of knee pain when climbing stairs.",
-        objective: "Mild swelling and tenderness at medial joint line.",
-        assessment: "Early degenerative changes likely; suspect patellofemoral involvement.",
-        plan: "Trial Abhyanga + strengthen quadriceps; physio referral; follow-up in 2 weeks.",
-        attachments: []
-      }
-    ]);
+  // cases (if none): Set to empty array for no demo data
+  if (!load(STORAGE.CASES) || load(STORAGE.CASES).length > 0) {
+    save(STORAGE.CASES, []);
   }
 
   // progress: generate simple weekly series for each patient (Pain/Sleep/Stress)
   if (!load(STORAGE.PROGRESS)) {
+    // Note: Since patients are empty, this will result in an empty progressStore
     const patients = load(STORAGE.PATIENTS, []);
     const progressStore = {};
     const weeks = 10;
@@ -112,57 +101,20 @@ function seedDemoData() {
     save(STORAGE.PROGRESS, progressStore);
   }
 
-  // appointments: if key missing or length < 8, add demo appointments without deleting existing ones
+  // appointments: Set to empty array for no demo data
   let appts = load(STORAGE.APPTS, []);
   if (!Array.isArray(appts)) appts = [];
-
-  if (appts.length < 8) {
-    // We'll create demo appts and append them (keep existing)
-    const now = new Date();
-
-    // Helper to create a date with specific hour:minute (local time)
-    function makeLocalDate(base, offsetDays, hour, minute) {
-      const d = new Date(base);
-      d.setDate(d.getDate() + (offsetDays || 0));
-      d.setHours(hour, minute || 0, 0, 0);
-      return d;
-    }
-
-    // Candidate demo appointments (times chosen to be reasonable)
-    const candidates = [
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 0, 9,  0).toISOString(),  duration:60, patientEmail:"patient1@example.com", patientName:"Ramesh Kumar",  notes:"Initial consult — knee pain",   status:"confirmed" },
-      { treatments:["Shirodhara"],start: makeLocalDate(now, 0, 11, 30).toISOString(), duration:45, patientEmail:"patient2@example.com", patientName:"Priya Sharma",  notes:"Sleep therapy follow-up",       status:"confirmed" },
-      { treatments:["Nasya"],     start: makeLocalDate(now, 0, 14, 0).toISOString(),  duration:30, patientEmail:"patient3@example.com", patientName:"Asha Patel",    notes:"Back pain consult",            status:"confirmed" },
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 0, 16, 0).toISOString(),  duration:60, patientEmail:"patient4@example.com", patientName:"Vikram Singh",  notes:"Digestive care",               status:"confirmed" },
-      { treatments:["Shirodhara"],start: makeLocalDate(now, 1, 9, 30).toISOString(),  duration:45, patientEmail:"patient2@example.com", patientName:"Priya Sharma",  notes:"Second session",               status:"confirmed" },
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 1, 11, 0).toISOString(),  duration:60, patientEmail:"patient1@example.com", patientName:"Ramesh Kumar",  notes:"Therapy session — package",    status:"confirmed" },
-      { treatments:["Nasya"],     start: makeLocalDate(now, 1, 14, 30).toISOString(), duration:30, patientEmail:"patient3@example.com", patientName:"Asha Patel",    notes:"Follow-up treatment",           status:"confirmed" },
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 1, 16, 30).toISOString(), duration:60, patientEmail:"patient4@example.com", patientName:"Vikram Singh",  notes:"Digestive therapy",            status:"confirmed" },
-      { treatments:["Shirodhara"],start: makeLocalDate(now, 2, 10, 0).toISOString(),  duration:45, patientEmail:"patient2@example.com", patientName:"Priya Sharma",  notes:"Third session",                status:"confirmed" },
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 2, 12, 0).toISOString(),  duration:60, patientEmail:"patient1@example.com", patientName:"Ramesh Kumar",  notes:"Progress check",               status:"confirmed" }
-    ];
-
-    // Add only as many as needed to reach 8 appointments
-    let needed = 8 - appts.length;
-    for (let i = 0; i < candidates.length && needed > 0; i++) {
-      // avoid duplicating an appointment with same start & patientName
-      const exists = appts.some(a => a.start === candidates[i].start && a.patientName === candidates[i].patientName);
-      if (!exists) {
-        appts.push({ id: genId(), ...candidates[i] });
-        needed--;
-      }
-    }
-    // If still need, shift times by +2 days to avoid duplicates
-    let idx = 0;
-    while (appts.length < 8 && idx < candidates.length) {
-      const c = candidates[idx];
-      const shifted = { ...c, start: new Date(new Date(c.start).getTime() + 2*24*3600*1000).toISOString() };
-      appts.push({ id: genId(), ...shifted });
-      idx++;
-    }
-
-    save(STORAGE.APPTS, appts);
+  
+  if (appts.length > 0) {
+      // If the array exists and is populated, we will ensure it is cleared
+      appts = [];
+      save(STORAGE.APPTS, appts);
+  } else {
+      // If key missing or length is 0 (which it will be after the above check), save an empty array.
+      save(STORAGE.APPTS, []);
   }
+
+  // The original logic to add demo appointments to reach 8 is removed.
 }
 
 /* ---------- small helpers ---------- */
@@ -382,7 +334,7 @@ function showPatientDetail(email) {
   const histEl = document.getElementById('pd-history'); if (histEl) { histEl.innerHTML = ""; (p.history || []).forEach(h=>{ const li = document.createElement('li'); li.textContent = h; histEl.appendChild(li); }); if ((p.history||[]).length===0) histEl.innerHTML = "<li class='text-gray-500'>No recorded history</li>"; }
   const allergiesEl = document.getElementById('pd-allergies'); if (allergiesEl) { allergiesEl.innerHTML = ""; (p.allergies||[]).forEach((a, idx)=>{ const pill = document.createElement('div'); pill.className="small-pill"; pill.textContent = a; const del = document.createElement('button'); del.className="ml-2 text-xs"; del.textContent="✕"; del.style.marginLeft="8px"; del.title = "Remove allergy"; del.addEventListener('click', ev=>{ ev.stopPropagation(); removePatientAllergy(p.email, idx);}); pill.appendChild(del); allergiesEl.appendChild(pill); }); if ((p.allergies||[]).length===0) allergiesEl.innerHTML = `<div class="text-gray-500">No known allergies</div>`; }
   const notesEl = document.getElementById('pd-notes'); if (notesEl) notesEl.value = p.notes || "";
-  const appts = (load(STORAGE.APPTS)||[]).filter(a => a.patientEmail === p.email).sort((a,b)=>new Date(b.start)-new Date(a.start));
+  const appts = (load(STORAGE.APPTS)||[]).filter(a => a.patientEmail === p.email).sort((a,b)=>new Date(b.start)-new Date(b.start));
   const apptsEl = document.getElementById('pd-appts'); if (apptsEl) {
     if (!appts || appts.length === 0) apptsEl.innerHTML = "<div class='text-gray-500'>No appointments found.</div>";
     else apptsEl.innerHTML = appts.map(a=>`<div class="p-2 border rounded mb-2 bg-white"><div class="font-semibold text-sage-800">${escapeHtml((a.treatments||[]).join(", "))}</div><div class="text-sm text-gray-600">${new Date(a.start).toLocaleString()} • ${a.duration} min • ${escapeHtml(a.status || '')}</div><div class="text-sm text-gray-700">Notes: ${escapeHtml(a.notes || '')}</div></div>`).join("");
@@ -463,7 +415,7 @@ function openCaseDetail(caseId) {
 
 /* ---------- Init wiring (DOMContentLoaded) ---------- */
 document.addEventListener('DOMContentLoaded', () => {
-  // seed demo data (ensures appointments exist)
+  // seed demo data (ensures treatments exist, but removes profile/patients/appointments/cases demo data)
   seedDemoData();
 
   // If coming from login, inject the email into profile (without overwriting name if set)
@@ -633,7 +585,8 @@ function renderCharts() {
   const patients = load(STORAGE.PATIENTS, []);
   const first = patients[0];
   const series = load(STORAGE.PROGRESS, {});
-  const pdata = first ? series[first.email] : null;
+  // pdata will be null/empty since patients and progress are cleared
+  const pdata = first ? series[first.email] : null; 
 
   const labels = pdata?.labels || ["-3w","-2w","-1w","This"];
   const pain   = pdata?.pain   || [6,5,4,3];
