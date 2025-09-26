@@ -49,27 +49,14 @@ function getDoctorDisplayName() {
 */
 function seedDemoData() {
   // profile: Set to empty object for no demo data
-  if (!load(STORAGE.PROFILE)) {
-    save(STORAGE.PROFILE, {});
-  }
+  // GUARANTEEING PROFILE DATA IS CLEARED
+  save(STORAGE.PROFILE, {});
 
-  // treatments: REMOVING ALL PRE-EXISTING DEMO TREATMENTS
-  if (!load(STORAGE.TREATMENTS) || load(STORAGE.TREATMENTS).length === 0) {
-    save(STORAGE.TREATMENTS, [
-      { id: 1, name: "Abhyanga", duration_min: 60, price: 1200, description: "Full-body oil massage", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", category: "panchakarma" },
-      { id: 2, name: "Shirodhara", duration_min: 45, price: 2500, description: "Oil poured on forehead", image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", category: "panchakarma" }
-    ]);
-  } else {
-     // If the key exists, we only save the two essential demo treatments, removing others
-     const existing = load(STORAGE.TREATMENTS).filter(t => t.id === 1 || t.id === 2);
-     if (existing.length < 2) {
-        save(STORAGE.TREATMENTS, [
-            { id: 1, name: "Abhyanga", duration_min: 60, price: 1200, description: "Full-body oil massage", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", category: "panchakarma" },
-            { id: 2, name: "Shirodhara", duration_min: 45, price: 2500, description: "Oil poured on forehead", image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", category: "panchakarma" }
-        ]);
-     }
+  // treatments: Set to empty array for no demo data
+  let treatments = load(STORAGE.TREATMENTS);
+  if (!Array.isArray(treatments) || treatments.length > 0) {
+    save(STORAGE.TREATMENTS, []);
   }
-
 
   // patients: Set to empty array for no demo data
   if (!load(STORAGE.PATIENTS) || load(STORAGE.PATIENTS).length > 0) {
