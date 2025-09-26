@@ -47,51 +47,7 @@ function getDoctorDisplayName() {
      - Patients/treatments/profile/cases exist for demo
      - Appointments: if there are fewer than 3 stored, create demo appointments to reach 3
 */
-function seedDemoData() {
-  // profile
-  if (!load(STORAGE.PROFILE)) {
-    save(STORAGE.PROFILE, {
-      name: "Dr. Anjali Verma",
-      email: "anjali@example.com",
-      phone: "+91-9876543210",
-      specialization: "Ayurveda Physician",
-      hours: "10:00–18:00",
-      bio: "Experienced practitioner in Panchakarma",
-      photo: ""
-    });
-  }
 
-  // treatments
-  if (!load(STORAGE.TREATMENTS)) {
-    save(STORAGE.TREATMENTS, [
-      { id: 1, name: "Abhyanga", duration_min: 60, price: 1200, description: "Full-body oil massage", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", category: "panchakarma" },
-      { id: 2, name: "Shirodhara", duration_min: 45, price: 2500, description: "Oil poured on forehead", image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", category: "panchakarma" }
-    ]);
-  }
-
-  // patients
-  if (!load(STORAGE.PATIENTS)) {
-    save(STORAGE.PATIENTS, [
-      { email: "patient1@example.com", name: "Ramesh Kumar", phone: "+91-9000000001", allergies: ["Penicillin"], notes: "Knee pain", dob: "1980-01-01", history: ["Hypertension"] },
-      { email: "patient2@example.com", name: "Priya Sharma", phone: "+91-9000000002", allergies: [], notes: "", dob: "1990-05-10", history: ["Insomnia"] }
-    ]);
-  }
-
-  // cases (if none)
-  if (!load(STORAGE.CASES)) {
-    save(STORAGE.CASES, [
-      {
-        id: genId(),
-        patientEmail: "patient1@example.com",
-        createdAt: new Date().toISOString(),
-        subjective: "Patient complains of knee pain when climbing stairs.",
-        objective: "Mild swelling and tenderness at medial joint line.",
-        assessment: "Early degenerative changes likely; suspect patellofemoral involvement.",
-        plan: "Trial Abhyanga + strengthen quadriceps; physio referral; follow-up in 2 weeks.",
-        attachments: []
-      }
-    ]);
-  }
 
   // progress: generate simple weekly series for each patient (Pain/Sleep/Stress)
   if (!load(STORAGE.PROGRESS)) {
@@ -128,21 +84,7 @@ function seedDemoData() {
       return d;
     }
 
-    // Candidate demo appointments (times chosen to be reasonable)
-    const candidates = [
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 0, 9,  0).toISOString(),  duration:60, patientEmail:"patient1@example.com", patientName:"Ramesh Kumar",  notes:"Initial consult — knee pain",   status:"confirmed" },
-      { treatments:["Shirodhara"],start: makeLocalDate(now, 0, 11, 30).toISOString(), duration:45, patientEmail:"patient2@example.com", patientName:"Priya Sharma",  notes:"Sleep therapy follow-up",       status:"confirmed" },
-      { treatments:["Nasya"],     start: makeLocalDate(now, 0, 14, 0).toISOString(),  duration:30, patientEmail:"patient3@example.com", patientName:"Asha Patel",    notes:"Back pain consult",            status:"confirmed" },
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 0, 16, 0).toISOString(),  duration:60, patientEmail:"patient4@example.com", patientName:"Vikram Singh",  notes:"Digestive care",               status:"confirmed" },
-      { treatments:["Shirodhara"],start: makeLocalDate(now, 1, 9, 30).toISOString(),  duration:45, patientEmail:"patient2@example.com", patientName:"Priya Sharma",  notes:"Second session",               status:"confirmed" },
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 1, 11, 0).toISOString(),  duration:60, patientEmail:"patient1@example.com", patientName:"Ramesh Kumar",  notes:"Therapy session — package",    status:"confirmed" },
-      { treatments:["Nasya"],     start: makeLocalDate(now, 1, 14, 30).toISOString(), duration:30, patientEmail:"patient3@example.com", patientName:"Asha Patel",    notes:"Follow-up treatment",           status:"confirmed" },
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 1, 16, 30).toISOString(), duration:60, patientEmail:"patient4@example.com", patientName:"Vikram Singh",  notes:"Digestive therapy",            status:"confirmed" },
-      { treatments:["Shirodhara"],start: makeLocalDate(now, 2, 10, 0).toISOString(),  duration:45, patientEmail:"patient2@example.com", patientName:"Priya Sharma",  notes:"Third session",                status:"confirmed" },
-      { treatments:["Abhyanga"],  start: makeLocalDate(now, 2, 12, 0).toISOString(),  duration:60, patientEmail:"patient1@example.com", patientName:"Ramesh Kumar",  notes:"Progress check",               status:"confirmed" }
-    ];
-
-    // Add only as many as needed to reach 8 appointments
+        // Add only as many as needed to reach 8 appointments
     let needed = 8 - appts.length;
     for (let i = 0; i < candidates.length && needed > 0; i++) {
       // avoid duplicating an appointment with same start & patientName
@@ -720,3 +662,4 @@ function renderCharts() {
   }
   plot(pain,'#567a3e'); plot(sleep,'#2b6b5a'); plot(stress,'#8b2d2d');
 }
+
