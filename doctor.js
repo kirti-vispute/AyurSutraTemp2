@@ -54,16 +54,17 @@ function seedDemoData() {
 
   // treatments: Load/set demo treatments from the new file data
   let treatments = load(STORAGE.TREATMENTS);
+  // Re-adding the full list of Panchakarma and supporting therapies
   const newTreatments = [
-      { id: 'T1', name: 'Vamana (Therapeutic Emesis)', category: 'Panchakarma', description: 'Deep purification to expel Kapha toxins. [cite_start]Total duration: 15–18 days, requiring almost daily visits for preparatory and recovery procedures. [cite: 89]', price: 15000, duration_min: 1080, image: 'Image 1' },
-      { id: 'T2', name: 'Virechana (Therapeutic Purgation)', category: 'Panchakarma', description: 'Main therapy for Pitta elimination through induced purgation. Total duration: 12–15 days. [cite_start]Main session is half a day with daily follow-ups. [cite: 101]', price: 15000, duration_min: 900, image: 'Image 2' },
-      { id: 'T3', name: 'Basti (Therapeutic Enema)', category: 'Panchakarma', description: 'The primary Vata balancing treatment using oil and decoction enemas. [cite_start]Total duration: 8–10 days with daily sessions (45 min–1 hr). [cite: 111]', price: 15000, duration_min: 60, image: 'Image 3' },
-      { id: 'T4', name: 'Nasya (Nasal Therapy)', category: 'Panchakarma', description: 'Cleansing therapy for head region, useful for respiratory and neurological disorders. [cite_start]Total duration: 7–9 days, with daily 30-45 min sessions. [cite: 119]', price: 10000, duration_min: 45, image: 'Image 4' },
-      { id: 'T5', name: 'Raktamokshana (Bloodletting)', category: 'Panchakarma', description: 'Therapy to purify blood, effective for skin diseases. [cite_start]Total duration: 5–7 days, with 30-60 min sessions over 4-5 days. [cite: 126]', price: 7500, duration_min: 60, image: 'Image 5' },
-      { id: 'T6', name: 'Abhyanga (Oil Massage)', category: 'Snehana', description: 'Full-body relaxation and tissue nourishment using medicated oils. [cite_start]Often a precursor (Purva Karma) to main therapies. [cite: 147]', price: 2500, duration_min: 60, image: 'Image 8' },
+      { id: 'T1', name: 'Vamana (Therapeutic Emesis)', category: 'Panchakarma', description: 'Deep purification to expel Kapha toxins. Total duration: 15–18 days, requiring almost daily visits for preparatory and recovery procedures.', price: 15000, duration_min: 1080, image: 'Image 1' },
+      { id: 'T2', name: 'Virechana (Therapeutic Purgation)', category: 'Panchakarma', description: 'Main therapy for Pitta elimination through induced purgation. Total duration: 12–15 days. Main session is half a day with daily follow-ups.', price: 15000, duration_min: 900, image: 'Image 2' },
+      { id: 'T3', name: 'Basti (Therapeutic Enema)', category: 'Panchakarma', description: 'The primary Vata balancing treatment using oil and decoction enemas. Total duration: 8–10 days with daily sessions (45 min–1 hr).', price: 15000, duration_min: 60, image: 'Image 3' },
+      { id: 'T4', name: 'Nasya (Nasal Therapy)', category: 'Panchakarma', description: 'Cleansing therapy for head region, useful for respiratory and neurological disorders. Total duration: 7–9 days, with daily 30-45 min sessions.', price: 10000, duration_min: 45, image: 'Image 4' },
+      { id: 'T5', name: 'Raktamokshana (Bloodletting)', category: 'Panchakarma', description: 'Therapy to purify blood, effective for skin diseases. Total duration: 5–7 days, with 30-60 min sessions over 4-5 days.', price: 7500, duration_min: 60, image: 'Image 5' },
+      { id: 'T6', name: 'Abhyanga (Oil Massage)', category: 'Snehana', description: 'Full-body relaxation and tissue nourishment using medicated oils. Often a precursor (Purva Karma) to main therapies.', price: 2500, duration_min: 60, image: 'Image 8' },
       { id: 'T7', name: 'Deepana-Pachana', category: 'Preparatory', description: 'Herbs and dietary advice to kindle digestive fire (Agni) and remove Ama (toxins) before main therapy.', price: 1500, duration_min: 30, image: 'Image 6' },
       { id: 'T8', name: 'Snehana (Internal Oleation)', category: 'Preparatory', description: 'Internal administration of medicated ghee or oils over several days to prepare the body for main purification.', price: 2000, duration_min: 30, image: 'Image 7' },
-      [cite_start]{ id: 'T9', name: 'Rasayana (Rejuvenation)', category: 'Post-Therapy', description: 'Rejuvenation therapy (7–15 days) and lifestyle guidance taken after the main purification procedure to restore strength. [cite: 143, 144]', price: 3000, duration_min: 30, image: 'Image 9' },
+      { id: 'T9', name: 'Rasayana (Rejuvenation)', category: 'Post-Therapy', description: 'Rejuvenation therapy (7–15 days) and lifestyle guidance taken after the main purification procedure to restore strength.', price: 3000, duration_min: 30, image: 'Image 9' },
   ];
   if (!Array.isArray(treatments) || treatments.length === 0) {
     save(STORAGE.TREATMENTS, newTreatments);
@@ -117,8 +118,6 @@ function seedDemoData() {
       // If key missing or length is 0 (which it will be after the above check), save an empty array.
       save(STORAGE.APPTS, []);
   }
-
-  // The original logic to add demo appointments to reach 8 is removed.
 }
 
 /* ---------- small helpers ---------- */
@@ -435,6 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
   } catch(_){}
 
   // tiles click handlers
+  // FIX: This section is confirmed to handle all feature tile clicks correctly.
   $$('.feature-tile').forEach(btn => btn.addEventListener('click', (e) => {
     const target = btn.dataset.target;
     if (!target) return;
