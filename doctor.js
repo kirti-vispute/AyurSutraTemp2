@@ -52,11 +52,28 @@ function seedDemoData() {
   // GUARANTEEING PROFILE DATA IS CLEARED
   save(STORAGE.PROFILE, {});
 
-  // treatments: Set to empty array for no demo data
+  // treatments: Load/set demo treatments from the new file data
   let treatments = load(STORAGE.TREATMENTS);
-  if (!Array.isArray(treatments) || treatments.length > 0) {
-    save(STORAGE.TREATMENTS, []);
+  const newTreatments = [
+      { id: 'T1', name: 'Vamana (Therapeutic Emesis)', category: 'Panchakarma', description: 'Deep purification to expel Kapha toxins. [cite_start]Total duration: 15–18 days, requiring almost daily visits for preparatory and recovery procedures. [cite: 89]', price: 15000, duration_min: 1080, image: 'Image 1' },
+      { id: 'T2', name: 'Virechana (Therapeutic Purgation)', category: 'Panchakarma', description: 'Main therapy for Pitta elimination through induced purgation. Total duration: 12–15 days. [cite_start]Main session is half a day with daily follow-ups. [cite: 101]', price: 15000, duration_min: 900, image: 'Image 2' },
+      { id: 'T3', name: 'Basti (Therapeutic Enema)', category: 'Panchakarma', description: 'The primary Vata balancing treatment using oil and decoction enemas. [cite_start]Total duration: 8–10 days with daily sessions (45 min–1 hr). [cite: 111]', price: 15000, duration_min: 60, image: 'Image 3' },
+      { id: 'T4', name: 'Nasya (Nasal Therapy)', category: 'Panchakarma', description: 'Cleansing therapy for head region, useful for respiratory and neurological disorders. [cite_start]Total duration: 7–9 days, with daily 30-45 min sessions. [cite: 119]', price: 10000, duration_min: 45, image: 'Image 4' },
+      { id: 'T5', name: 'Raktamokshana (Bloodletting)', category: 'Panchakarma', description: 'Therapy to purify blood, effective for skin diseases. [cite_start]Total duration: 5–7 days, with 30-60 min sessions over 4-5 days. [cite: 126]', price: 7500, duration_min: 60, image: 'Image 5' },
+      { id: 'T6', name: 'Abhyanga (Oil Massage)', category: 'Snehana', description: 'Full-body relaxation and tissue nourishment using medicated oils. [cite_start]Often a precursor (Purva Karma) to main therapies. [cite: 147]', price: 2500, duration_min: 60, image: 'Image 8' },
+      { id: 'T7', name: 'Deepana-Pachana', category: 'Preparatory', description: 'Herbs and dietary advice to kindle digestive fire (Agni) and remove Ama (toxins) before main therapy.', price: 1500, duration_min: 30, image: 'Image 6' },
+      { id: 'T8', name: 'Snehana (Internal Oleation)', category: 'Preparatory', description: 'Internal administration of medicated ghee or oils over several days to prepare the body for main purification.', price: 2000, duration_min: 30, image: 'Image 7' },
+      [cite_start]{ id: 'T9', name: 'Rasayana (Rejuvenation)', category: 'Post-Therapy', description: 'Rejuvenation therapy (7–15 days) and lifestyle guidance taken after the main purification procedure to restore strength. [cite: 143, 144]', price: 3000, duration_min: 30, image: 'Image 9' },
+  ];
+  if (!Array.isArray(treatments) || treatments.length === 0) {
+    save(STORAGE.TREATMENTS, newTreatments);
+  } else {
+      // If some treatments were saved manually, ensure the new ones are added
+      const existingIds = new Set(treatments.map(t => t.id));
+      const treatmentsToAdd = newTreatments.filter(t => !existingIds.has(t.id));
+      save(STORAGE.TREATMENTS, [...treatments, ...treatmentsToAdd]);
   }
+
 
   // patients: Set to empty array for no demo data
   if (!load(STORAGE.PATIENTS) || load(STORAGE.PATIENTS).length > 0) {
@@ -68,21 +85,21 @@ function seedDemoData() {
     save(STORAGE.CASES, []);
   }
 
-  // progress: generate simple weekly series for each patient (Pain/Sleep/Stress)
+  // progress: generate simple daily series for each patient (Pain/Sleep/Stress)
   if (!load(STORAGE.PROGRESS)) {
     // Note: Since patients are empty, this will result in an empty progressStore
     const patients = load(STORAGE.PATIENTS, []);
     const progressStore = {};
-    const weeks = 10;
-    const now = Date.now();
+    // Main therapy period set to 11 days (as requested)
+    const MAIN_THERAPY_DAYS = 11;
+    
     patients.forEach((p, idx) => {
-      const labels = Array.from({length: weeks}, (_, i) => {
-        const d = new Date(now - (weeks-1-i)*7*24*3600*1000);
-        return `${d.getMonth()+1}/${d.getDate()}`;
-      });
-      const pain   = Array.from({length: weeks}, (_, i) => Math.max(0, Math.round((6 + (Math.sin(i/2 + idx) * 1.4) - i*0.25) * 10)/10));
-      const sleep  = Array.from({length: weeks}, (_, i) => Math.max(3, Math.round((6 + (Math.cos(i/3 + idx) * 1.1) + i*0.12) * 10)/10));
-      const stress = Array.from({length: weeks}, (_, i) => Math.max(1, Math.round((5 + (Math.sin(i/1.6 + idx) * 1.0) - i*0.18) * 10)/10));
+      // Use Day labels to reflect the requested 'day in the phase'
+      const labels = Array.from({length: MAIN_THERAPY_DAYS}, (_, i) => `Day ${i + 1}`);
+      // Series generation adjusted for the new 'days' length (11 days)
+      const pain   = Array.from({length: MAIN_THERAPY_DAYS}, (_, i) => Math.max(0, Math.round((6 + (Math.sin(i/2 + idx) * 1.4) - i*0.25) * 10)/10));
+      const sleep  = Array.from({length: MAIN_THERAPY_DAYS}, (_, i) => Math.max(3, Math.round((6 + (Math.cos(i/3 + idx) * 1.1) + i*0.12) * 10)/10));
+      const stress = Array.from({length: MAIN_THERAPY_DAYS}, (_, i) => Math.max(1, Math.round((5 + (Math.sin(i/1.6 + idx) * 1.0) - i*0.18) * 10)/10));
       progressStore[p.email] = { labels, pain, sleep, stress };
     });
     save(STORAGE.PROGRESS, progressStore);
@@ -168,6 +185,7 @@ function renderTreatments(filter="all", search=""){
   list.forEach(t=> {
     const card = document.createElement('div');
     card.className = "treatment-card bg-white rounded-2xl shadow-md overflow-hidden flex flex-col cursor-pointer";
+    // NOTE: t.image is now a string like 'Image 1' which the platform is expected to render
     card.innerHTML = `
       <div class="relative w-full h-48 overflow-hidden"><img src="${t.image||''}" alt="${escapeHtml(t.name)}" class="w-full h-full object-cover"></div>
       <div class="p-6 flex-1">
@@ -209,7 +227,7 @@ function renderTreatments(filter="all", search=""){
 function renderTreatmentDetail(t){
   const c = document.getElementById('treatment-detail-content');
   if (!c) return;
-  c.innerHTML = `<h4 class="text-xl font-semibold">${escapeHtml(t.name)}</h4><p class="text-sage-600 text-sm mb-2">${escapeHtml(t.category||'')} • ${t.duration_min || t.duration || ''} mins • ₹${t.price}</p><p class="text-gray-700 mb-3">${escapeHtml(t.description||"")}</p><div class="flex gap-2"><button id="detail-book" class="px-4 py-2 bg-sage-600 text-white rounded">Book Now</button><button id="detail-close" class="px-4 py-2 btn-back">Close</button></div>`;
+  c.innerHTML = `<h4 class="text-xl font-semibold">${escapeHtml(t.name)}</h4><p class="text-sage-600 text-sm mb-2">${escapeHtml(t.category||'')} • ${t.duration_min || t.duration || ''} min${(t.duration_min>120 || !t.duration_min) ? 's' : ''} • ₹${t.price}</p><p class="text-gray-700 mb-3">${escapeHtml(t.description||"")}</p><div class="flex gap-2"><button id="detail-book" class="px-4 py-2 bg-sage-600 text-white rounded">Book Now</button><button id="detail-close" class="px-4 py-2 btn-back">Close</button></div>`;
   const detailBook = document.getElementById('detail-book');
   if (detailBook) detailBook.addEventListener('click', ()=> toast("Open Book flow to schedule appointment."));
   const detailClose = document.getElementById('detail-close');
@@ -575,15 +593,19 @@ function renderCharts() {
   // pdata will be null/empty since patients and progress are cleared
   const pdata = first ? series[first.email] : null; 
 
-  const labels = pdata?.labels || ["-3w","-2w","-1w","This"];
-  const pain   = pdata?.pain   || [6,5,4,3];
-  const sleep  = pdata?.sleep  || [6,6.2,6.5,7];
-  const stress = pdata?.stress || [5,4.4,3.8,3];
+  // Hardcoded fallback data is now set for the 11-day 'Main Therapy' period (as requested)
+  const MAIN_THERAPY_DAYS = 11;
+
+  // Change from weekly labels/data to 11-day daily labels/data
+  const labels = pdata?.labels || Array.from({length: MAIN_THERAPY_DAYS}, (_, i) => `Day ${i + 1}`);
+  const pain   = pdata?.pain   || [8, 7.5, 7, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3]; // 11 data points
+  const sleep  = pdata?.sleep  || [5, 5.2, 5.5, 5.8, 6, 6.2, 6.5, 6.8, 7, 7.2, 7.5]; // 11 data points
+  const stress = pdata?.stress || [7, 6.8, 6.5, 6.2, 5.8, 5.5, 5, 4.5, 4, 3.5, 3]; // 11 data points
 
   // If Chart.js available
   if (typeof Chart !== 'undefined' && patientCanvas.getContext) {
     try {
-      // Patient progress line chart
+      // Patient progress line chart (now 11-day series, daily unit)
       new Chart(patientCanvas, {
         type: 'line',
         data: { labels, datasets: [
@@ -603,7 +625,7 @@ function renderCharts() {
         }
       });
 
-      // Therapy effectiveness bar chart (static comparison)
+      // Therapy effectiveness bar chart (static comparison - unchanged)
       if (therapyCanvas && therapyCanvas.getContext) {
         new Chart(therapyCanvas, {
           type: 'bar',
