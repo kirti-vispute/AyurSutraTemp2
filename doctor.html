@@ -5,14 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AyurSutra — Doctor Portal</title>
 
-  <!-- Tailwind-like utilities used for layout only (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Chart.js for charts (unchanged) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Local stylesheet -->
   <link rel="stylesheet" href="doctor.css">
   <style>
     .logo-container {
@@ -29,7 +26,6 @@
 </head>
 <body class="gradient-bg min-h-screen text-sage-900">
 
-  <!-- Header -->
   <header class="sticky top-0 z-50 bg-transparent backdrop-blur-sm py-4">
     <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
       <div class="flex items-center gap-4">
@@ -44,25 +40,30 @@
     </div>
   </header>
 
-  <!-- Toast placeholder -->
   <div id="toast-root" aria-live="polite" class="fixed top-6 left-1/2 -translate-x-1/2 z-50"></div>
 
-  <!-- Main -->
   <main class="max-w-7xl mx-auto px-6 py-12">
 
-    <!-- Welcome -->
     <div class="text-center mb-10">
       <h2 id="welcome-text" class="font-serif text-3xl md:text-4xl text-sage-800">Welcome, Doctor!</h2>
     </div>
 
-    <!-- Tiles (Dashboard) -->
     <div id="dashboard" class="max-w-6xl mx-auto mb-12">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         <button class="feature-tile" data-target="profile-section"><svg class="tile-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm-8 9a8 8 0 0116 0H4z"/></svg><span class="tile-label">My Profile</span></button>
 
         <button class="feature-tile" data-target="treatments-section"><svg class="tile-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L8 7h8l-4-5zM4 11h16v9H4z"/></svg><span class="tile-label">Treatments</span></button>
 
-        <button class="feature-tile" data-target="booking-section"><svg class="tile-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10h10v2H7zM5 21h14V7H5zM7 3h2v2H7zM15 3h2v2h-2z"/></svg><span class="tile-label">My Patients</span></button>
+        <button class="feature-tile" data-target="treatment-tracker-section">
+            <svg class="tile-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-6h2v6h-2zm0-8V7h2v2h-2z"/></svg>
+            <span class="tile-label">Treatment Tracker</span>
+            <span id="tracker-dashboard-summary" class="absolute top-2 right-2 text-xs bg-sage-500 text-white px-2 py-0.5 rounded-full font-sans shadow-md" style="font-size: 0.75rem; line-height: 1;">Loading...</span>
+        </button>
+
+        <button class="feature-tile" data-target="booking-section">
+          <svg class="tile-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10h10v2H7zM5 21h14V7H5zM7 3h2v2H7zM15 3h2v2h-2z"/></svg>
+          <span class="tile-label">My Patients</span>
+        </button>
 
         <button class="feature-tile" data-target="appointments-section"><svg class="tile-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v2H7zM3 17h18v2H3z"/></svg><span class="tile-label">My Appointments</span></button>
 
@@ -72,13 +73,15 @@
 
         <button class="feature-tile" data-target="feedback-section"><svg class="tile-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 6h-2V4a2 2 0 00-2-2H7a2 2 0 00-2 2v2H3v13l4-3h10l4 3V6z"/></svg><span class="tile-label">Feedback</span></button>
 
-        <button id="emergency-btn" class="feature-tile emergency-tile" data-target="emergency-section"><svg class="tile-icon emergency-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2zM11 9h2v5h-2V9zm0 7h2v2h-2v-2z"/></svg><span class="tile-label emergency-label">Emergency</span></button>
+        <div class="md:col-span-4 flex justify-center">
+            <button id="emergency-btn" class="feature-tile emergency-tile w-full sm:w-1/2 md:w-1/4" data-target="emergency-section">
+                <svg class="tile-icon emergency-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2zM11 9h2v5h-2V9zm0 7h2v2h-2v-2z"/></svg>
+                <span class="tile-label emergency-label">Emergency</span>
+            </button>
+        </div>
       </div>
     </div>
 
-    <!-- Sections (hidden & toggled by JS) -->
-
-    <!-- Profile -->
     <section id="profile-section" class="page-content hidden max-w-5xl mx-auto mt-6">
       <div class="bg-white p-8 rounded-2xl shadow border border-sage-100">
         <div class="flex justify-between items-start mb-4">
@@ -131,7 +134,6 @@
       </div>
     </section>
 
-    <!-- Treatments -->
     <section id="treatments-section" class="page-content hidden mt-6 max-w-6xl mx-auto">
       <div class="bg-white p-8 rounded-2xl shadow border border-sage-100">
         <div class="flex items-center justify-between mb-4">
@@ -150,7 +152,6 @@
       </div>
     </section>
 
-    <!-- Treatment detail -->
     <section id="treatment-detail-section" class="page-content hidden mt-6 max-w-4xl mx-auto">
       <div class="bg-white p-6 rounded-2xl shadow border border-sage-100">
         <div class="flex justify-between items-start mb-4">
@@ -164,7 +165,23 @@
       </div>
     </section>
 
-    <!-- BOOKING (My Patients) -->
+    <section id="treatment-tracker-section" class="page-content hidden mt-6 max-w-6xl mx-auto">
+      <div class="bg-white p-6 rounded-2xl shadow border border-sage-100">
+        <div class="flex items-start justify-between mb-4">
+          <h3 class="text-2xl font-serif">Patient Treatment Tracker</h3>
+          <button class="go-dashboard btn-back">Go to Dashboard</button>
+        </div>
+
+        <p class="text-gray-700 mb-6">
+          View and manage the current treatment day and **phase** (Pre-Therapy, Main, Post-Therapy) for all patients on an active plan. Click 'Next Phase' to advance the session.
+        </p>
+
+        <div id="tracker-patient-list" class="space-y-4">
+          <div class="p-4 text-gray-500 border rounded">Loading patient data...</div>
+        </div>
+      </div>
+    </section>
+    
     <section id="booking-section" class="page-content hidden mt-6 max-w-6xl mx-auto">
       <div class="bg-white p-6 rounded-2xl shadow border border-sage-100">
         <div class="flex items-start justify-between mb-4">
@@ -240,7 +257,6 @@
       </div>
     </section>
 
-    <!-- Appointments -->
     <section id="appointments-section" class="page-content hidden mt-6 max-w-6xl mx-auto">
       <div class="bg-white p-6 rounded-2xl shadow border border-sage-100">
         <div class="flex items-start justify-between mb-4">
@@ -256,7 +272,6 @@
       </div>
     </section>
 
-    <!-- PLANS => CASE STUDY (SOAP) -->
     <section id="plans-section" class="page-content hidden mt-6 max-w-6xl mx-auto">
       <div class="bg-white p-6 rounded-2xl shadow border border-sage-100">
         <div class="flex items-start justify-between mb-4">
@@ -272,7 +287,6 @@
         </p>
 
         <div class="grid md:grid-cols-3 gap-6">
-          <!-- Left: list of case studies -->
           <div class="md:col-span-1 border rounded p-3 max-h-[60vh] overflow-auto">
             <div class="mb-3">
               <label class="text-sm text-sage-700">Filter by patient</label>
@@ -282,11 +296,9 @@
             </div>
 
             <div id="cases-list" class="space-y-3">
-              <!-- case cards populated by JS -->
-            </div>
+              </div>
           </div>
 
-          <!-- Right: detail + form -->
           <div class="md:col-span-2 border rounded p-4 bg-sage-50">
             <div id="case-empty" class="text-gray-500">Choose or create a case note to view / edit here.</div>
 
@@ -344,7 +356,6 @@
       </div>
     </section>
 
-    <!-- Charts -->
     <section id="charts-section" class="page-content hidden mt-6 max-w-6xl mx-auto">
       <div class="bg-white p-8 rounded-2xl shadow border border-sage-100">
         <div class="flex justify-between items-start mb-4">
@@ -359,7 +370,6 @@
       </div>
     </section>
 
-    <!-- Feedback -->
     <section id="feedback-section" class="page-content hidden mt-6 max-w-6xl mx-auto">
       <div class="bg-white p-8 rounded-2xl shadow border border-sage-100">
         <div class="flex justify-between items-start mb-4">
@@ -377,7 +387,6 @@
       </div>
     </section>
 
-    <!-- Emergency -->
     <section id="emergency-section" class="page-content hidden mt-6 max-w-4xl mx-auto">
       <div class="bg-white p-8 rounded-2xl shadow border border-sage-100">
         <div class="flex justify-between items-start mb-4">
@@ -397,7 +406,6 @@
 
   <footer class="text-center py-8 text-sage-700">© 2025 AyurSutra. All rights reserved.</footer>
 
-  <!-- Load the script after DOM parsing so event listeners attach reliably -->
   <script type="module" src="doctor.fb.js" defer></script>
   <script src="doctor.js" defer></script>
   <script type="module" src="firebaseInit.js"></script>
