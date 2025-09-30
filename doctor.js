@@ -52,29 +52,11 @@ function seedDemoData() {
   // GUARANTEEING PROFILE DATA IS CLEARED
   save(STORAGE.PROFILE, {});
 
-  // treatments: Load/set demo treatments from the new file data
+  // treatments: Set to empty array for no demo data
   let treatments = load(STORAGE.TREATMENTS);
-  // Re-adding the full list of Panchakarma and supporting therapies
-  const newTreatments = [
-      { id: 'T1', name: 'Vamana (Therapeutic Emesis)', category: 'Panchakarma', description: 'Deep purification to expel Kapha toxins. Total duration: 15–18 days, requiring almost daily visits for preparatory and recovery procedures.', price: 15000, duration_min: 1080, image: 'Image 1' },
-      { id: 'T2', name: 'Virechana (Therapeutic Purgation)', category: 'Panchakarma', description: 'Main therapy for Pitta elimination through induced purgation. Total duration: 12–15 days. Main session is half a day with daily follow-ups.', price: 15000, duration_min: 900, image: 'Image 2' },
-      { id: 'T3', name: 'Basti (Therapeutic Enema)', category: 'Panchakarma', description: 'The primary Vata balancing treatment using oil and decoction enemas. Total duration: 8–10 days with daily sessions (45 min–1 hr).', price: 15000, duration_min: 60, image: 'Image 3' },
-      { id: 'T4', name: 'Nasya (Nasal Therapy)', category: 'Panchakarma', description: 'Cleansing therapy for head region, useful for respiratory and neurological disorders. Total duration: 7–9 days, with daily 30-45 min sessions.', price: 10000, duration_min: 45, image: 'Image 4' },
-      { id: 'T5', name: 'Raktamokshana (Bloodletting)', category: 'Panchakarma', description: 'Therapy to purify blood, effective for skin diseases. Total duration: 5–7 days, with 30-60 min sessions over 4-5 days.', price: 7500, duration_min: 60, image: 'Image 5' },
-      { id: 'T6', name: 'Abhyanga (Oil Massage)', category: 'Snehana', description: 'Full-body relaxation and tissue nourishment using medicated oils. Often a precursor (Purva Karma) to main therapies.', price: 2500, duration_min: 60, image: 'Image 8' },
-      { id: 'T7', name: 'Deepana-Pachana', category: 'Preparatory', description: 'Herbs and dietary advice to kindle digestive fire (Agni) and remove Ama (toxins) before main therapy.', price: 1500, duration_min: 30, image: 'Image 6' },
-      { id: 'T8', name: 'Snehana (Internal Oleation)', category: 'Preparatory', description: 'Internal administration of medicated ghee or oils over several days to prepare the body for main purification.', price: 2000, duration_min: 30, image: 'Image 7' },
-      { id: 'T9', name: 'Rasayana (Rejuvenation)', category: 'Post-Therapy', description: 'Rejuvenation therapy (7–15 days) and lifestyle guidance taken after the main purification procedure to restore strength.', price: 3000, duration_min: 30, image: 'Image 9' },
-  ];
-  if (!Array.isArray(treatments) || treatments.length === 0) {
-    save(STORAGE.TREATMENTS, newTreatments);
-  } else {
-      // If some treatments were saved manually, ensure the new ones are added
-      const existingIds = new Set(treatments.map(t => t.id));
-      const treatmentsToAdd = newTreatments.filter(t => !existingIds.has(t.id));
-      save(STORAGE.TREATMENTS, [...treatments, ...treatmentsToAdd]);
+  if (!Array.isArray(treatments) || treatments.length > 0) {
+    save(STORAGE.TREATMENTS, []);
   }
-
 
   // patients: Set to empty array for no demo data
   if (!load(STORAGE.PATIENTS) || load(STORAGE.PATIENTS).length > 0) {
@@ -118,6 +100,8 @@ function seedDemoData() {
       // If key missing or length is 0 (which it will be after the above check), save an empty array.
       save(STORAGE.APPTS, []);
   }
+
+  // The original logic to add demo appointments to reach 8 is removed.
 }
 
 /* ---------- small helpers ---------- */
@@ -184,7 +168,6 @@ function renderTreatments(filter="all", search=""){
   list.forEach(t=> {
     const card = document.createElement('div');
     card.className = "treatment-card bg-white rounded-2xl shadow-md overflow-hidden flex flex-col cursor-pointer";
-    // NOTE: t.image is now a string like 'Image 1' which the platform is expected to render
     card.innerHTML = `
       <div class="relative w-full h-48 overflow-hidden"><img src="${t.image||''}" alt="${escapeHtml(t.name)}" class="w-full h-full object-cover"></div>
       <div class="p-6 flex-1">
@@ -226,7 +209,7 @@ function renderTreatments(filter="all", search=""){
 function renderTreatmentDetail(t){
   const c = document.getElementById('treatment-detail-content');
   if (!c) return;
-  c.innerHTML = `<h4 class="text-xl font-semibold">${escapeHtml(t.name)}</h4><p class="text-sage-600 text-sm mb-2">${escapeHtml(t.category||'')} • ${t.duration_min || t.duration || ''} min${(t.duration_min>120 || !t.duration_min) ? 's' : ''} • ₹${t.price}</p><p class="text-gray-700 mb-3">${escapeHtml(t.description||"")}</p><div class="flex gap-2"><button id="detail-book" class="px-4 py-2 bg-sage-600 text-white rounded">Book Now</button><button id="detail-close" class="px-4 py-2 btn-back">Close</button></div>`;
+  c.innerHTML = `<h4 class="text-xl font-semibold">${escapeHtml(t.name)}</h4><p class="text-sage-600 text-sm mb-2">${escapeHtml(t.category||'')} • ${t.duration_min || t.duration || ''} mins • ₹${t.price}</p><p class="text-gray-700 mb-3">${escapeHtml(t.description||"")}</p><div class="flex gap-2"><button id="detail-book" class="px-4 py-2 bg-sage-600 text-white rounded">Book Now</button><button id="detail-close" class="px-4 py-2 btn-back">Close</button></div>`;
   const detailBook = document.getElementById('detail-book');
   if (detailBook) detailBook.addEventListener('click', ()=> toast("Open Book flow to schedule appointment."));
   const detailClose = document.getElementById('detail-close');
@@ -434,7 +417,6 @@ document.addEventListener('DOMContentLoaded', () => {
   } catch(_){}
 
   // tiles click handlers
-  // FIX: This section is confirmed to handle all feature tile clicks correctly.
   $$('.feature-tile').forEach(btn => btn.addEventListener('click', (e) => {
     const target = btn.dataset.target;
     if (!target) return;
